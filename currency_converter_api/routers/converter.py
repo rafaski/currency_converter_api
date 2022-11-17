@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Request
-from typing import Optional
-import requests
+import httpx
 
 from currency_converter_api.schemas import Output
 from currency_converter_api._secrets import key
 
 router = APIRouter()
 
-# apikey provided upon request
+# replace key with apikey
 API_KEY = key
 BASE_URL = "https://api.fastforex.io/"
 HEADERS = {"accept": "application/json"}
@@ -22,11 +21,12 @@ async def currencies(request: Request):
     params = {
         "api_key": API_KEY
     }
-    response = requests.get(
-        url=f"{BASE_URL}{endpoint}",
-        params=params,
-        headers=HEADERS
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            url=f"{BASE_URL}{endpoint}",
+            params=params,
+            headers=HEADERS
+        )
     return Output(success=True, results=response.json())
 
 
@@ -50,11 +50,12 @@ async def convert(
         "amount": amount,
         "api_key": API_KEY
     }
-    response = requests.get(
-        url=f"{BASE_URL}{endpoint}",
-        params=params,
-        headers=HEADERS
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            url=f"{BASE_URL}{endpoint}",
+            params=params,
+            headers=HEADERS
+        )
     return Output(success=True, results=response.json())
 
 
@@ -79,11 +80,12 @@ async def convert(
         "to": to_curr,
         "api_key": API_KEY
     }
-    response = requests.get(
-        url=f"{BASE_URL}{endpoint}",
-        params=params,
-        headers=HEADERS
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            url=f"{BASE_URL}{endpoint}",
+            params=params,
+            headers=HEADERS
+        )
     return Output(success=True, results=response.json())
 
 
@@ -104,11 +106,12 @@ async def fetch_one(
         "to": to_curr,
         "api_key": API_KEY
     }
-    response = requests.get(
-        url=f"{BASE_URL}{endpoint}",
-        params=params,
-        headers=HEADERS
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            url=f"{BASE_URL}{endpoint}",
+            params=params,
+            headers=HEADERS
+        )
     return Output(success=True, results=response.json())
 
 
@@ -123,9 +126,10 @@ async def fetch_all(request: Request, from_curr: str):
         "from": from_curr,
         "api_key": API_KEY
     }
-    response = requests.get(
-        url=f"{BASE_URL}{endpoint}",
-        params=params,
-        headers=HEADERS
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            url=f"{BASE_URL}{endpoint}",
+            params=params,
+            headers=HEADERS
+        )
     return Output(success=True, results=response.json())
