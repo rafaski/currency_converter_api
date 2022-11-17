@@ -61,10 +61,9 @@ async def convert(
 @router.get("/historical", response_model=Output)
 async def convert(
         request: Request,
-        amount: int,
         from_curr: str,
         to_curr: str,
-        date: Optional[str] = None
+        date: str
 ):
     """
     Gets you historical conversion data. Due to trial version,
