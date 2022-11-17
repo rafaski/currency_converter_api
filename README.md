@@ -1,6 +1,7 @@
 # currency_converter_api
 A currency converter built with fastapi in python.
-Currency Converter allows you to:
+
+### Currency Converter allows you to:
 
 * **get all supported currencies** 
 * **convert currencies** 
