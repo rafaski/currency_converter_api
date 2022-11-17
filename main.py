@@ -7,6 +7,7 @@ from _secrets import key
 
 app = FastAPI()
 
+# apikey provided upon request
 API_KEY = key
 BASE_URL = "https://api.fastforex.io/"
 HEADERS = {"accept": "application/json"}
