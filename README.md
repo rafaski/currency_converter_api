@@ -8,4 +8,4 @@ A currency converter built with fastapi in python.
 * **fetch a single currency exchange rate** 
 * **fetch all currency exchange rate** 
 
-Based on fastforex.io api.
+Data fetched from fastforex.io api.
