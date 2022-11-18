@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Request, Depends
 import httpx
 import redis
-import json
-from datetime import datetime, timedelta
 
-from currency_converter_api.schemas import Output
+from currency_converter_api.schemas import Output, User
 from currency_converter_api._secrets import key
 from currency_converter_api.routers.auth import verify_token
+from currency_converter_api.redis_operations import get, store, store_exp
 
 router = APIRouter()
 
@@ -16,6 +15,20 @@ redis_connection = redis.Redis(host="127.0.0.1", port=6379)
 API_KEY = key
 BASE_URL = "https://api.fastforex.io/"
 HEADERS = {"accept": "application/json"}
+
+
+@router.post("/create_user", response_model=Output)
+async def create_user(request: Request, user: User):
+    """
+    Create user for authorization
+    """
+    new_user = user.dict()
+    redis_key = user.login
+    redis_response = get(key=redis_key)
+    if redis_response is None:
+        store(key=redis_key, value=new_user)
+        return Output(success=True, message="New user created")
+    return Output(success=False, message="User already in database")
 
 
 @router.get(
@@ -38,16 +51,13 @@ async def currencies(request: Request):
             headers=HEADERS
         )
     forex_response = forex_response.json()
+
     redis_key = f"{endpoint}"
-    redis_store = redis_connection.set(
-        name=redis_key,
-        value=json.dumps(forex_response)
-    )
-    if redis_store is not None:
-        redis_response = redis_connection.get(redis_key)
-        redis_response = json.loads(redis_response)
-        return Output(success=True, results=redis_response)
-    return Output(success=True, results=forex_response)
+    redis_response = get(key=redis_key)
+    if redis_response is None:
+        store(key=redis_key, value=forex_response)
+        return Output(success=True, results=forex_response)
+    return Output(success=True, results=redis_response)
 
 
 @router.get("/convert", response_model=Output)
@@ -135,7 +145,14 @@ async def fetch_one(
             headers=HEADERS
         )
     forex_response = forex_response.json()
-    return Output(success=True, results=forex_response)
+
+    redis_key = f"{endpoint}{from_curr}{to_curr}"
+    key_exp = 60 * 60
+    redis_response = get(key=redis_key)
+    if redis_response is None:
+        store_exp(key=redis_key, time=key_exp, value=forex_response)
+        return Output(success=True, results=forex_response)
+    return Output(success=True, results=redis_response)
 
 
 @router.get("/fetch_all", response_model=Output)
@@ -143,7 +160,6 @@ async def fetch_all(request: Request, from_curr: str):
     """
     Fetch all available currency rates.
     from_curr : Base currency symbol
-    TODO: Redis cache
     """
     endpoint = "fetch-all"
     params = {
@@ -158,40 +174,10 @@ async def fetch_all(request: Request, from_curr: str):
         )
     forex_response = forex_response.json()
 
-    # redis_key = f"{endpoint}{from_curr}"
-    #
-    # if redis_connection.get(redis_key) is None:
-    #     redis_connection.set(
-    #         name=redis_key,
-    #         value=json.dumps(forex_response.json())
-    #     )
-    #     redis_response = redis_connection.get(redis_key)
-    #     redis_response = json.loads(redis_response)
-    #     return Output(success=True, results=redis_response)
-    # else:
-    #     if
-    #     redis_response = redis_connection.get(redis_key)
-    #     redis_response = json.loads(redis_response)
-    #     if redis_response["updated"]
-
-
-    # lifetime_in_hours = 1.0
-    # last_update_str = forex_response["updated"]
-    # last_update_obj = datetime.strptime(last_update_str, '%Y-%m-%d %H:%M:%S')
-    # dt = datetime.now() - last_update_obj
-    # if dt / timedelta(minutes=60) < lifetime_in_hours:
-    #     print("less than hour")
-    # else:
-    #     print("more than hour")
-    #
-    # redis_key = f"{endpoint}{from_curr}"
-    # redis_store = redis_connection.set(
-    #     name=redis_key,
-    #     value=json.dumps(forex_response.json())
-    # )
-    # if redis_store is not None:
-    #     redis_response = redis_connection.get(redis_key)
-    #     redis_response = json.loads(redis_response)
-    # #     if redis_response["updated"]
-    #     return Output(success=True, results=redis_response)
-    return Output(success=True, results=forex_response)
+    redis_key = f"{endpoint}{from_curr}"
+    key_exp = 60*60
+    redis_response = get(key=redis_key)
+    if redis_response is None:
+        store_exp(key=redis_key, time=key_exp, value=forex_response)
+        return Output(success=True, results=forex_response)
+    return Output(success=True, results=redis_response)
