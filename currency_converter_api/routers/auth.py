@@ -1,6 +1,10 @@
 from fastapi import HTTPException, Request
+from dotenv import load_dotenv
+from os import getenv
 
-X_TOKEN = "secret-token"
+load_dotenv()
+
+X_TOKEN = getenv("X_TOKEN")
 
 
 async def verify_token(request: Request):
