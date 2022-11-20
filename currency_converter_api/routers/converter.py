@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Request, Depends
 import httpx
 import redis
+from dotenv import load_dotenv
+from os import getenv
 
-from currency_converter_api.schemas import Output, User
-from currency_converter_api._secrets import key
+from currency_converter_api.schemas import Output, Login
 from currency_converter_api.routers.auth import verify_token
 from currency_converter_api.redis_operations import get, store, store_exp
 
@@ -11,19 +12,20 @@ router = APIRouter()
 
 redis_connection = redis.Redis(host="127.0.0.1", port=6379)
 
-# replace key with apikey
-API_KEY = key
+load_dotenv()
+
+API_KEY = getenv("API_KEY")
 BASE_URL = "https://api.fastforex.io/"
 HEADERS = {"accept": "application/json"}
 
 
 @router.post("/create_user", response_model=Output)
-async def create_user(request: Request, user: User):
+async def create_user(request: Request, login: Login):
     """
     Create user for authorization
     """
-    new_user = user.dict()
-    redis_key = user.login
+    new_user = login.dict()
+    redis_key = login.user
     redis_response = get(key=redis_key)
     if redis_response is None:
         store(key=redis_key, value=new_user)
