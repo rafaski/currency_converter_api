@@ -1,37 +1,42 @@
-from fastapi import APIRouter, Request, Depends
-import httpx
-import redis
-from dotenv import load_dotenv
-from os import getenv
+from fastapi import APIRouter, Request, Depends, HTTPException
 
-from currency_converter_api.schemas import Output, Login
+from currency_converter_api.schemas import Output, User
 from currency_converter_api.routers.auth import verify_token
-from currency_converter_api.redis_operations import get, store, store_exp
+from currency_converter_api.aioredis_operations import (
+    get, store, store_exp, lpush, rpoplpush
+)
+from currency_converter_api.forex_client import ForexClient
 
 router = APIRouter()
 
-redis_connection = redis.Redis(host="127.0.0.1", port=6379)
-
-load_dotenv()
-
-API_KEY = getenv("API_KEY")
-BASE_URL = "https://api.fastforex.io/"
-HEADERS = {"accept": "application/json"}
-
 
 @router.post("/create_user", response_model=Output)
-async def create_user(request: Request, login: Login):
+async def create_user(request: Request, user: User):
     """
-    Create user for authorization
+    Create user
     """
-    new_user = login.dict()
-    redis_key = login.user
-    redis_response = get(key=redis_key)
-    if redis_response is None:
-        store(key=redis_key, value=new_user)
-        return Output(success=True, message="New user created")
-    return Output(success=False, message="User already in database")
+    redis_key = "users"
+    first_item = None
+    user_exists = False
 
+    # CHECK WHETHER THE USER EXISTS
+    while not user_exists:
+        email = rpoplpush(redis_key)
+        if first_item is None:
+            first_item = user.email
+        if email == user.email:
+            user_exists = True
+        if email == first_item:
+            break
+
+    if user_exists:
+        raise HTTPException(
+            status_code=400,
+            detail="Email already exists"
+        )
+
+    await lpush(redis_key, user.email)
+    return Output(success=True, message="User created")
 
 @router.get(
     "/currencies",
@@ -43,21 +48,15 @@ async def currencies(request: Request):
     Fetch a list of supported currencies
     """
     endpoint = "currencies"
-    params = {
-        "api_key": API_KEY
-    }
-    async with httpx.AsyncClient() as client:
-        forex_response = await client.get(
-            url=f"{BASE_URL}{endpoint}",
-            params=params,
-            headers=HEADERS
-        )
-    forex_response = forex_response.json()
-
+    params = {}
+    forex_response = await ForexClient().forex_client(
+        endpoint=endpoint,
+        params=params
+    )
     redis_key = f"{endpoint}"
     redis_response = get(key=redis_key)
     if redis_response is None:
-        store(key=redis_key, value=forex_response)
+        await store(key=redis_key, value=forex_response)
         return Output(success=True, results=forex_response)
     return Output(success=True, results=redis_response)
 
@@ -79,21 +78,17 @@ async def convert(
     params = {
         "from": from_curr,
         "to": to_curr,
-        "amount": amount,
-        "api_key": API_KEY
+        "amount": amount
     }
-    async with httpx.AsyncClient() as client:
-        forex_response = await client.get(
-            url=f"{BASE_URL}{endpoint}",
-            params=params,
-            headers=HEADERS
-        )
-    forex_response = forex_response.json()
+    forex_response = await ForexClient().forex_client(
+        endpoint=endpoint,
+        params=params
+    )
     return Output(success=True, results=forex_response)
 
 
 @router.get("/historical", response_model=Output)
-async def convert(
+async def historical(
         request: Request,
         from_curr: str,
         to_curr: str,
@@ -110,16 +105,12 @@ async def convert(
     params = {
         "date": date,
         "from": from_curr,
-        "to": to_curr,
-        "api_key": API_KEY
+        "to": to_curr
     }
-    async with httpx.AsyncClient() as client:
-        forex_response = await client.get(
-            url=f"{BASE_URL}{endpoint}",
-            params=params,
-            headers=HEADERS
-        )
-    forex_response = forex_response.json()
+    forex_response = await ForexClient().forex_client(
+        endpoint=endpoint,
+        params=params
+    )
     return Output(success=True, results=forex_response)
 
 
@@ -137,22 +128,18 @@ async def fetch_one(
     endpoint = "fetch-one"
     params = {
         "from": from_curr,
-        "to": to_curr,
-        "api_key": API_KEY
+        "to": to_curr
     }
-    async with httpx.AsyncClient() as client:
-        forex_response = await client.get(
-            url=f"{BASE_URL}{endpoint}",
-            params=params,
-            headers=HEADERS
-        )
-    forex_response = forex_response.json()
+    forex_response = await ForexClient().forex_client(
+        endpoint=endpoint,
+        params=params
+    )
 
     redis_key = f"{endpoint}{from_curr}{to_curr}"
     key_exp = 60 * 60
-    redis_response = get(key=redis_key)
+    redis_response = await get(key=redis_key)
     if redis_response is None:
-        store_exp(key=redis_key, time=key_exp, value=forex_response)
+        await store_exp(key=redis_key, time=key_exp, value=forex_response)
         return Output(success=True, results=forex_response)
     return Output(success=True, results=redis_response)
 
@@ -165,21 +152,16 @@ async def fetch_all(request: Request, from_curr: str):
     """
     endpoint = "fetch-all"
     params = {
-        "from": from_curr,
-        "api_key": API_KEY
+        "from": from_curr
     }
-    async with httpx.AsyncClient() as client:
-        forex_response = await client.get(
-            url=f"{BASE_URL}{endpoint}",
-            params=params,
-            headers=HEADERS
-        )
-    forex_response = forex_response.json()
-
+    forex_response = await ForexClient().forex_client(
+        endpoint=endpoint,
+        params=params
+    )
     redis_key = f"{endpoint}{from_curr}"
     key_exp = 60*60
-    redis_response = get(key=redis_key)
+    redis_response = await get(key=redis_key)
     if redis_response is None:
-        store_exp(key=redis_key, time=key_exp, value=forex_response)
+        await store_exp(key=redis_key, time=key_exp, value=forex_response)
         return Output(success=True, results=forex_response)
     return Output(success=True, results=redis_response)
