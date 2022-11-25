@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, HTTPException
+from datetime import datetime
 
 from currency_converter_api.schemas import Output, User
-from currency_converter_api.routers.auth import verify_token
-from currency_converter_api.aioredis_operations import (
-    get, store, store_exp, lpush, rpoplpush
-)
+from currency_converter_api.redis_operations import (lpush, rpoplpush)
 from currency_converter_api.forex_client import ForexClient
 
 router = APIRouter()
@@ -38,27 +36,18 @@ async def create_user(request: Request, user: User):
     await lpush(redis_key, user.email)
     return Output(success=True, message="User created")
 
+
 @router.get(
     "/currencies",
-    dependencies=[Depends(verify_token)],
+    # dependencies=[Depends(verify_token)],
     response_model=Output
 )
 async def currencies(request: Request):
     """
     Fetch a list of supported currencies
     """
-    endpoint = "currencies"
-    params = {}
-    forex_response = await ForexClient().forex_client(
-        endpoint=endpoint,
-        params=params
-    )
-    redis_key = f"{endpoint}"
-    redis_response = get(key=redis_key)
-    if redis_response is None:
-        await store(key=redis_key, value=forex_response)
-        return Output(success=True, results=forex_response)
-    return Output(success=True, results=redis_response)
+    available_currencies = await ForexClient().get_currencies()
+    return Output(success=True, results=available_currencies)
 
 
 @router.get("/convert", response_model=Output)
@@ -74,25 +63,20 @@ async def convert(
     to_curr : Target currency symbol
     amount : Amount of source currency to convert
     """
-    endpoint = "convert"
-    params = {
-        "from": from_curr,
-        "to": to_curr,
-        "amount": amount
-    }
-    forex_response = await ForexClient().forex_client(
-        endpoint=endpoint,
-        params=params
+    converted_currency = await ForexClient().convert(
+        from_curr=from_curr,
+        to_curr=to_curr,
+        amount=amount
     )
-    return Output(success=True, results=forex_response)
+    return Output(success=True, results=converted_currency)
 
 
 @router.get("/historical", response_model=Output)
 async def historical(
-        request: Request,
-        from_curr: str,
-        to_curr: str,
-        date: str
+    request: Request,
+    from_curr: str,
+    to_curr: str,
+    date: str
 ):
     """
     Gets you historical conversion data. Due to trial version,
@@ -101,17 +85,20 @@ async def historical(
     to_curr : Target currency symbol
     date: UTC date in YYYY-MM-DD format
     """
-    endpoint = "historical"
-    params = {
-        "date": date,
-        "from": from_curr,
-        "to": to_curr
-    }
-    forex_response = await ForexClient().forex_client(
-        endpoint=endpoint,
-        params=params
+    historical_date = datetime.strptime(date, "%Y-%m-%d")
+    today_date = datetime.today()
+    dt = today_date - historical_date
+    if dt.days > 14:
+        raise HTTPException(
+            status_code=400,
+            detail="date must be limited to within tle last 14 days"
+        )
+    historical_rates = await ForexClient().get_historical_rates(
+        from_curr=from_curr,
+        to_curr=to_curr,
+        date=date
     )
-    return Output(success=True, results=forex_response)
+    return Output(success=True, results=historical_rates)
 
 
 @router.get("/fetch_one", response_model=Output)
@@ -125,23 +112,11 @@ async def fetch_one(
     from_curr : Base currency symbol
     to_curr : Target currency symbol
     """
-    endpoint = "fetch-one"
-    params = {
-        "from": from_curr,
-        "to": to_curr
-    }
-    forex_response = await ForexClient().forex_client(
-        endpoint=endpoint,
-        params=params
+    currency_rate = await ForexClient().get_currency_rate(
+        from_curr=from_curr,
+        to_curr=to_curr
     )
-
-    redis_key = f"{endpoint}{from_curr}{to_curr}"
-    key_exp = 60 * 60
-    redis_response = await get(key=redis_key)
-    if redis_response is None:
-        await store_exp(key=redis_key, time=key_exp, value=forex_response)
-        return Output(success=True, results=forex_response)
-    return Output(success=True, results=redis_response)
+    return Output(success=True, results=currency_rate)
 
 
 @router.get("/fetch_all", response_model=Output)
@@ -150,18 +125,7 @@ async def fetch_all(request: Request, from_curr: str):
     Fetch all available currency rates.
     from_curr : Base currency symbol
     """
-    endpoint = "fetch-all"
-    params = {
-        "from": from_curr
-    }
-    forex_response = await ForexClient().forex_client(
-        endpoint=endpoint,
-        params=params
+    all_currency_rates = await ForexClient().get_all_currency_rates(
+        from_curr=from_curr
     )
-    redis_key = f"{endpoint}{from_curr}"
-    key_exp = 60*60
-    redis_response = await get(key=redis_key)
-    if redis_response is None:
-        await store_exp(key=redis_key, time=key_exp, value=forex_response)
-        return Output(success=True, results=forex_response)
-    return Output(success=True, results=redis_response)
+    return Output(success=True, results=all_currency_rates)
