@@ -1,23 +1,14 @@
 from fastapi import HTTPException, Request
-from dotenv import load_dotenv
-from os import getenv
-
-load_dotenv()
-
-X_TOKEN = getenv("X_TOKEN")
 
 
-async def verify_token(request: Request):
+async def verify_user(request: Request, email: str, api_key: str):
+    """
+    Verifies is user is authorized to request data.
+    Valid email and api key is required.
+    """
     headers = dict(request.headers)
-    if headers.get("x-token") == X_TOKEN:
-        return headers.get("x-token")
-    raise HTTPException(status_code=400, detail="X-Token header invalid")
-
-
-async def verify_user(request: Request, login: str, password: str):
-    headers = dict(request.headers)
-    if headers.get("login") == login and headers.get("password") == password:
-        return headers.get("login"), headers.get("password")
-    raise HTTPException(status_code=400, detail="User unauthorized")
+    if headers.get("email") == email and headers.get("api_key") == api_key:
+        return headers.get("email"), headers.get("api_key")
+    raise HTTPException(status_code=401, detail="User unauthorized")
 
 

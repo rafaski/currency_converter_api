@@ -1,17 +1,22 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Depends
 from datetime import datetime
+from dotenv import load_dotenv
+from os import getenv
 
 from currency_converter_api.schemas import Output, User
 from currency_converter_api.redis_operations import (lpush, rpoplpush)
 from currency_converter_api.forex_client import ForexClient
+from currency_converter_api.routers.auth import verify_user
 
 router = APIRouter()
+
+load_dotenv()
 
 
 @router.post("/create_user", response_model=Output)
 async def create_user(request: Request, user: User):
     """
-    Create user
+    Create a user and store user data in redis cache
     """
     redis_key = "users"
     first_item = None
@@ -34,12 +39,13 @@ async def create_user(request: Request, user: User):
         )
 
     await lpush(redis_key, user.email)
-    return Output(success=True, message="User created")
+    api_key = getenv("API_KEY")
+    return Output(success=True, message="User created", results=api_key)
 
 
 @router.get(
     "/currencies",
-    # dependencies=[Depends(verify_token)],
+    dependencies=[Depends(verify_user)],
     response_model=Output
 )
 async def currencies(request: Request):
@@ -50,7 +56,11 @@ async def currencies(request: Request):
     return Output(success=True, results=available_currencies)
 
 
-@router.get("/convert", response_model=Output)
+@router.get(
+    "/convert",
+    dependencies=[Depends(verify_user)],
+    response_model=Output
+)
 async def convert(
     request: Request,
     amount: int,
@@ -71,7 +81,49 @@ async def convert(
     return Output(success=True, results=converted_currency)
 
 
-@router.get("/historical", response_model=Output)
+@router.get(
+    "/fetch_one",
+    dependencies=[Depends(verify_user)],
+    response_model=Output
+)
+async def fetch_one(
+    request: Request,
+    from_curr: str,
+    to_curr: str
+):
+    """
+    Fetch a single currency exchange rate, from and to any supported currency.
+    from_curr : Base currency symbol
+    to_curr : Target currency symbol
+    """
+    currency_rate = await ForexClient().get_currency_rate(
+        from_curr=from_curr,
+        to_curr=to_curr
+    )
+    return Output(success=True, results=currency_rate)
+
+
+@router.get(
+    "/fetch_all",
+    dependencies=[Depends(verify_user)],
+    response_model=Output
+)
+async def fetch_all(request: Request, from_curr: str):
+    """
+    Fetch all available currency rates.
+    from_curr : Base currency symbol
+    """
+    all_currency_rates = await ForexClient().get_all_currency_rates(
+        from_curr=from_curr
+    )
+    return Output(success=True, results=all_currency_rates)
+
+
+@router.get(
+    "/historical",
+    dependencies=[Depends(verify_user)],
+    response_model=Output
+)
 async def historical(
     request: Request,
     from_curr: str,
@@ -101,31 +153,3 @@ async def historical(
     return Output(success=True, results=historical_rates)
 
 
-@router.get("/fetch_one", response_model=Output)
-async def fetch_one(
-    request: Request,
-    from_curr: str,
-    to_curr: str
-):
-    """
-    Fetch a single currency exchange rate, from and to any supported currency.
-    from_curr : Base currency symbol
-    to_curr : Target currency symbol
-    """
-    currency_rate = await ForexClient().get_currency_rate(
-        from_curr=from_curr,
-        to_curr=to_curr
-    )
-    return Output(success=True, results=currency_rate)
-
-
-@router.get("/fetch_all", response_model=Output)
-async def fetch_all(request: Request, from_curr: str):
-    """
-    Fetch all available currency rates.
-    from_curr : Base currency symbol
-    """
-    all_currency_rates = await ForexClient().get_all_currency_rates(
-        from_curr=from_curr
-    )
-    return Output(success=True, results=all_currency_rates)
