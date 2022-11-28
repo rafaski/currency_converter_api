@@ -21,7 +21,8 @@ class User(BaseModel):
 
     @validator("email")
     def validate_email(cls, value: str):
-        pattern = r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"
+        pattern = \
+            r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
         if re.match(pattern, value):
             return value
         raise HTTPException(status_code=400, detail="Check your email address")
