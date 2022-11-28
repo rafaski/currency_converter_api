@@ -4,6 +4,7 @@ from os import getenv
 from functools import wraps
 from typing import Optional
 from fastapi import HTTPException
+from enum import Enum
 
 from currency_converter_api.redis_operations import (
     get, store_exp
@@ -13,6 +14,9 @@ load_dotenv()
 
 
 def cache(func):
+    """
+    Cache forex client api response in redis
+    """
     @wraps(func)
     async def _cache(*args, **kwargs):
         forex_client_obj = args[0]
@@ -28,7 +32,7 @@ def cache(func):
             # no results in redis, call the API
             results = await func(*args, **kwargs)
             await store_exp(
-                key=kwargs.get("endpoint"),
+                key=forex_client_obj.redis_key,
                 value=results,
                 time=forex_client_obj.data_ttl
             )
@@ -37,7 +41,9 @@ def cache(func):
 
 
 def validate_input(func):
-
+    """
+    Validate if currency code is supported by forex api
+    """
     @wraps(func)
     async def _validate_input(*args, **kwargs):
 
@@ -74,6 +80,9 @@ class ForexClient:
         endpoint: str,
         parameters: Optional[dict] = None
     ) -> dict:
+        """
+        Make a http request to fetch data from forex API
+        """
         if parameters:
             self.params.update(parameters)
         async with httpx.AsyncClient() as client:
@@ -85,22 +94,22 @@ class ForexClient:
         return forex_response.json()
 
     async def get_currencies(self) -> dict:
+        """
+        Fetch a list of supported currencies
+        """
         self.data_ttl = 60 * 60 * 24
         self.redis_key = "currencies"
-        response = await self.request(endpoint="currencies")
+        endpoint = ForexEndpoint.CURRENCIES
+        response = await self.request(endpoint=endpoint)
         return response["currencies"]
 
     @validate_input
-    async def convert(self, from_curr: str, to_curr: str, amount: int) -> float:
-        currency_rate = await self.get_currency_rate(
-            from_curr=from_curr,
-            to_curr=to_curr
-        )
-        return currency_rate * amount
-
     async def get_currency_rate(self, from_curr: str, to_curr: str) -> float:
+        """
+        Fetch a single currency exchange rate, from and to any supported currency
+        """
         self.redis_key = f"{from_curr}-{to_curr}"
-        endpoint = "fetch-one"
+        endpoint = ForexEndpoint.FETCH_ONE
         params = {
             "from": from_curr,
             "to": to_curr
@@ -109,25 +118,54 @@ class ForexClient:
         currency_rate = results["result"][to_curr]
         return currency_rate
 
+    @validate_input
+    async def convert(self, from_curr: str, to_curr: str, amount: int) -> float:
+        """
+        Convert an amount of one currency into another currency
+        """
+        currency_rate = await self.get_currency_rate(
+            from_curr=from_curr,
+            to_curr=to_curr
+        )
+        return currency_rate * amount
+
+    @validate_input
     async def get_all_currency_rates(self, from_curr: str) -> dict:
+        """
+        Fetch all available currency rates
+        """
         self.redis_key = from_curr
-        endpoint = "fetch-all"
+        endpoint = ForexEndpoint.FETCH_ALL
         params = {
             "from": from_curr
         }
         return await self.request(endpoint=endpoint, parameters=params)
 
+    @validate_input
     async def get_historical_rates(
         self,
         from_curr: str,
         to_curr: str,
         date: str
     ) -> dict:
-        endpoint = "historical"
+        """
+        Get historical conversion rate data
+        """
+        endpoint = ForexEndpoint.HISTORICAL
         params = {
             "date": date,
             "from": from_curr,
             "to": to_curr
         }
         return await self.request(endpoint=endpoint, parameters=params)
+
+
+class ForexEndpoint(Enum):
+    """
+    Enums for forex endpoints
+    """
+    CURRENCIES = "currencies"
+    FETCH_ONE = "fetch-one"
+    FETCH_ALL = "fetch-all"
+    HISTORICAL = "historical"
 
