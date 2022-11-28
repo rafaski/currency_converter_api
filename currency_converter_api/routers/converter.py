@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from os import getenv
 
 from currency_converter_api.schemas import Output, User
-from currency_converter_api.redis_operations import (lpush, rpoplpush)
+from currency_converter_api.redis_operations import (get, lpush, rpoplpush)
 from currency_converter_api.forex_client import ForexClient
 from currency_converter_api.routers.auth import verify_user
 
@@ -21,6 +21,7 @@ async def create_user(request: Request, user: User):
     redis_key = "users"
     first_item = None
     user_exists = False
+    api_key = getenv("API_KEY")
 
     # CHECK WHETHER THE USER EXISTS
     while not user_exists:
@@ -39,8 +40,18 @@ async def create_user(request: Request, user: User):
         )
 
     await lpush(redis_key, user.email)
-    api_key = getenv("API_KEY")
+
     return Output(success=True, message="User created", results=api_key)
+
+
+@router.get("/all_users", response_model=Output)
+async def all_users(request: Request):
+    """
+    Get a list of all signed-up users
+    """
+    redis_key = "users"
+    user_list = await get(key=redis_key)
+    return Output(success=True, results=user_list)
 
 
 @router.get(
