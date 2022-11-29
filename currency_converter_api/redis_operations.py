@@ -1,27 +1,41 @@
 import aioredis
 from typing import Any, NoReturn
 import json
+from typing import Optional
 
-redis_connection = aioredis.from_url("redis://localhost")
+redis_connection = aioredis.from_url("redis://127.0.0.1:6379")
 
 
-async def get(key: str) -> Any:
+def cast(
+    value: Optional[Any],  # this is a value loaded from redis
+    expected_type: str = "str",
+) -> Optional[Any]:
+    if any([value is None, expected_type is None]):
+        return value
+
+    if expected_type == "dict":
+        return json.loads(value)
+    if expected_type == "str":
+        return value.decode("utf-8")
+
+
+async def get(key: str, expected_type: Optional[str] = "str") -> Any:
     results = await redis_connection.get(key)
-    if results is not None:
-        results = json.loads(results)
-    return results
+    return cast(value=results, expected_type=expected_type)
 
 
 async def lpush(key: str, value: str) -> None:
     await redis_connection.lpush(key, value)
 
 
-def rpoplpush(key: str) -> str:
-    return redis_connection.rpoplpush(key)
+async def rpoplpush(key: str) -> str:
+    return await redis_connection.rpoplpush(key, key)
 
 
-async def store(key: str, value: dict) -> None:
-    await redis_connection.set(name=key, value=json.dumps(value))
+async def store(key: str, value: Any) -> None:
+    if isinstance(value, dict):
+        value = json.dumps(value)
+    await redis_connection.set(name=key, value=value)
 
 
 async def store_exp(key: str, time: int, value: dict) -> None:
