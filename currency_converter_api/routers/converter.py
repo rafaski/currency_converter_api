@@ -1,62 +1,17 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from datetime import datetime
-from dotenv import load_dotenv
-from os import getenv
 
-from currency_converter_api.schemas import Output, User
-from currency_converter_api.redis_operations import (get, lpush, rpoplpush)
+from currency_converter_api.schemas import Output
 from currency_converter_api.forex_client import ForexClient
 from currency_converter_api.routers.auth import verify_user
 
-router = APIRouter()
-
-load_dotenv()
-
-
-@router.post("/create_user", response_model=Output)
-async def create_user(request: Request, user: User):
-    """
-    Create a user and store user data in redis cache
-    """
-    redis_key = "users"
-    first_item = None
-    user_exists = False
-    api_key = getenv("API_KEY")
-
-    # CHECK WHETHER THE USER EXISTS
-    while not user_exists:
-        email = rpoplpush(redis_key)
-        if first_item is None:
-            first_item = user.email
-        if email == user.email:
-            user_exists = True
-        if email == first_item:
-            break
-
-    if user_exists:
-        raise HTTPException(
-            status_code=400,
-            detail="Email already exists"
-        )
-
-    await lpush(redis_key, user.email)
-
-    return Output(success=True, message="User created", results=api_key)
-
-
-@router.get("/all_users", response_model=Output)
-async def all_users(request: Request):
-    """
-    Get a list of all signed-up users
-    """
-    redis_key = "users"
-    user_list = await get(key=redis_key)
-    return Output(success=True, results=user_list)
+router = APIRouter(
+    dependencies=[Depends(verify_user)]
+)
 
 
 @router.get(
     "/currencies",
-    dependencies=[Depends(verify_user)],
     response_model=Output
 )
 async def currencies(request: Request):
@@ -69,7 +24,6 @@ async def currencies(request: Request):
 
 @router.get(
     "/convert",
-    dependencies=[Depends(verify_user)],
     response_model=Output
 )
 async def convert(
@@ -94,7 +48,6 @@ async def convert(
 
 @router.get(
     "/fetch_one",
-    dependencies=[Depends(verify_user)],
     response_model=Output
 )
 async def fetch_one(
@@ -116,7 +69,6 @@ async def fetch_one(
 
 @router.get(
     "/fetch_all",
-    dependencies=[Depends(verify_user)],
     response_model=Output
 )
 async def fetch_all(request: Request, from_curr: str):
@@ -132,7 +84,6 @@ async def fetch_all(request: Request, from_curr: str):
 
 @router.get(
     "/historical",
-    dependencies=[Depends(verify_user)],
     response_model=Output
 )
 async def historical(
