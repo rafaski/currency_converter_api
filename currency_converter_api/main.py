@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from routers.converter import router
-
+from routers.converter import router as converter_router
+from routers.users import router as user_router
 
 description = """
 Currency Converter allows you to:
@@ -20,6 +20,7 @@ app = FastAPI(
         "name": "FastForex",
         "url": "https://www.fastforex.io/",
     },
-    )
+)
 
-app.include_router(router)
+app.include_router(user_router)
+app.include_router(converter_router)
