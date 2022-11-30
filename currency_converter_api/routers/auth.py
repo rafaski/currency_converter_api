@@ -1,6 +1,7 @@
-from fastapi import HTTPException, Request
+from fastapi import Request
 
 from currency_converter_api.redis_operations import get
+from currency_converter_api.errors import Unauthorized
 
 
 async def verify_user(request: Request):
@@ -13,4 +14,4 @@ async def verify_user(request: Request):
     api_key = headers.get("api_key")
     if api_key == await get(email):
         return api_key
-    raise HTTPException(status_code=401, detail="User unauthorized")
+    raise Unauthorized()
