@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from currency_converter_api.schemas import Output, User
 from currency_converter_api.redis_operations import get, lpush, store
+from currency_converter_api.errors import BadRequest
 
 router = APIRouter()
 
@@ -34,10 +35,7 @@ async def create_user(request: Request, user: User):
     #         detail="Email already exists"
     #     )
     if await get(key=user.email):
-        raise HTTPException(
-                status_code=400,
-                detail="Email already exists"
-            )
+        raise BadRequest(details="Email already exists")
 
     api_key = str(uuid4())[:13]
     await store(key=user.email, value=api_key)

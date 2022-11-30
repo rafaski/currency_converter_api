@@ -3,14 +3,21 @@ from dotenv import load_dotenv
 from os import getenv
 from functools import wraps
 from typing import Optional
-from fastapi import HTTPException
 from enum import Enum
 
-from currency_converter_api.redis_operations import (
-    get, store_exp
+from currency_converter_api.redis_operations import get, store_exp
+from currency_converter_api.errors import (
+    BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded
 )
 
 load_dotenv()
+
+# exception_mapper = {
+#     400: ForexException,
+#     401: ForexInvalidApiKey,
+#     403: ForexException,
+#     429: ForexRateLimitExceeded
+# }
 
 
 def cache(func):
@@ -59,9 +66,19 @@ def validate_input(func):
             not await is_currency_valid(kwargs.get("from_curr")),
             not await is_currency_valid(kwargs.get("to_curr"))
         ]):
-            raise HTTPException(status_code=400, detail="Invalid currency")
+            raise BadRequest(details="Invalid currency")
         return await func(*args, **kwargs)
     return _validate_input
+
+
+def httpx_error_handler(func):
+    @wraps(func)
+    async def _http_error_handler(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except httpx.HTTPError as error:
+            raise ForexException(details=str(error))
+    return _http_error_handler
 
 
 class ForexClient:
@@ -74,6 +91,7 @@ class ForexClient:
     data_ttl = 60 * 60
     redis_key: Optional[str] = None
 
+    @httpx_error_handler
     @cache
     async def request(
         self,
@@ -91,6 +109,20 @@ class ForexClient:
                 params=self.params,
                 headers=self.headers
             )
+            # handling forex exceptions
+            # if forex_response.status_code is not 200:
+            #     raise exception_mapper.get(forex_response.status_code)(
+            #         details=forex_response.text
+            #     )
+            if forex_response.status_code == 400:
+                raise ForexException(details="Bad request to forex api")
+            if forex_response.status_code == 401:
+                raise ForexInvalidApiKey()
+            if forex_response.status_code == 403:
+                raise ForexException(details="Forbidden")
+            if forex_response.status_code == 429:
+                raise ForexRateLimitExceeded()
+
         return forex_response.json()
 
     async def get_currencies(self) -> dict:

@@ -4,6 +4,7 @@ from datetime import datetime
 from currency_converter_api.schemas import Output
 from currency_converter_api.forex_client import ForexClient
 from currency_converter_api.routers.auth import verify_user
+from currency_converter_api.errors import BadRequest
 
 router = APIRouter(
     dependencies=[Depends(verify_user)]
@@ -103,9 +104,8 @@ async def historical(
     today_date = datetime.today()
     dt = today_date - historical_date
     if dt.days > 14:
-        raise HTTPException(
-            status_code=400,
-            detail="date must be limited to within tle last 14 days"
+        raise BadRequest(
+            details="date must be limited to within tle last 14 days"
         )
     historical_rates = await ForexClient().get_historical_rates(
         from_curr=from_curr,
