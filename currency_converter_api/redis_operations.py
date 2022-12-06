@@ -4,7 +4,7 @@ import json
 from typing import Optional
 from functools import wraps
 
-from currency_converter_api.errors import RedisException
+from errors import RedisException
 
 redis_connection = aioredis.from_url("redis://127.0.0.1:6379")
 
@@ -56,8 +56,10 @@ async def store(key: str, value: Any) -> None:
 
 
 @redis_operation
-async def store_exp(key: str, time: int, value: dict) -> None:
-    await redis_connection.setex(name=key, time=time, value=json.dumps(value))
+async def store_exp(key: str, time: int, value: Any) -> None:
+    if isinstance(value, dict):
+        value = json.dumps(value)
+    await redis_connection.setex(name=key, time=time, value=value)
 
 
 @redis_operation

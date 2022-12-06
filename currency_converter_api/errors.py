@@ -3,7 +3,10 @@ from enum import Enum
 
 
 class ErrorTypes(str, Enum):
-    
+    """
+    Enums for custom error types for exception handling
+    """
+
     # APP errors
     UNKNOWN = "unknown"
     # API errors

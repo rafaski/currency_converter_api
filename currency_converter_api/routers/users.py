@@ -1,15 +1,27 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request
 from uuid import uuid4
 
-from currency_converter_api.schemas import Output, User
+from currency_converter_api.schemas import Output, CreateUser
 from currency_converter_api.redis_operations import get, lpush, store
 from currency_converter_api.errors import BadRequest
+from currency_converter_api.sql.database import database
+from currency_converter_api.sql.models import users
 
 router = APIRouter()
 
 
+@router.on_event("startup")
+async def startup():
+    await database.connect()
+
+
+@router.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
+
+
 @router.post("/create_user", response_model=Output)
-async def create_user(request: Request, user: User):
+async def create_user(request: Request, user: CreateUser):
     """
     Create a user and store user data in redis cache
     """
@@ -40,6 +52,17 @@ async def create_user(request: Request, user: User):
     api_key = str(uuid4())[:13]
     await store(key=user.email, value=api_key)
     await lpush(key="users", value=user.email)
+    # sql
+    query_sql = users.insert().values(
+        email=user.email,
+        api_key=api_key,
+        concurrency=user.concurrency,
+        credits=user.credits,
+        subscription=user.subscription,
+        expiration=user.expiration
+    )
+    last_record_id = await database.execute(query_sql)
+
     return Output(success=True, message="User created", results=api_key)
 
 
@@ -49,5 +72,9 @@ async def all_users(request: Request):
     Get a list of all signed-up users
     """
     redis_key = "users"
-    user_list = await get(key=redis_key)
-    return Output(success=True, results=user_list)
+    user_list_redis = await get(key=redis_key)
+    # sql
+    query_sql = users.select()
+    user_list_sql = await database.fetch_all(query_sql)
+
+    return Output(success=True, results=query_sql)

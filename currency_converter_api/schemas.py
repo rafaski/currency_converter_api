@@ -3,6 +3,8 @@ from typing import Optional, Any
 from fastapi import HTTPException
 import re
 
+from datetime import datetime, timedelta
+
 
 class Output(BaseModel):
     """
@@ -13,11 +15,16 @@ class Output(BaseModel):
     results: Optional[Any] = None
 
 
-class User(BaseModel):
+class CreateUser(BaseModel):
     """
-    User login info
+    User sign up info
     """
     email: str
+    api_key: str
+    concurrency: Optional[bool] = False
+    credits: Optional[int] = 0
+    subscription: Optional[str] = "basic"
+    expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
     @validator("email")
     def validate_email(cls, value: str):
@@ -28,4 +35,5 @@ class User(BaseModel):
         raise HTTPException(status_code=400, detail="Check your email address")
 
 
-
+class ReadUser(BaseModel):
+    pass
