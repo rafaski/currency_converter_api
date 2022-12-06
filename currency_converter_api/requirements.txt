@@ -3,3 +3,4 @@ uvicorn
 httpx
 redis
 python-dotenv
+sqlalchemy

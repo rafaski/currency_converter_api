@@ -5,8 +5,8 @@ from functools import wraps
 from typing import Optional
 from enum import Enum
 
-from currency_converter_api.redis_operations import get, store_exp
-from currency_converter_api.errors import (
+from redis_operations import get, store_exp
+from errors import (
     BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded
 )
 
@@ -22,7 +22,7 @@ load_dotenv()
 
 def cache(func):
     """
-    Cache forex client api response in redis
+    Cache forex client api response into redis
     """
     @wraps(func)
     async def _cache(*args, **kwargs):
@@ -72,6 +72,9 @@ def validate_input(func):
 
 
 def httpx_error_handler(func):
+    """
+    A generic httpx error handler
+    """
     @wraps(func)
     async def _http_error_handler(*args, **kwargs):
         try:
@@ -82,6 +85,9 @@ def httpx_error_handler(func):
 
 
 class ForexClient:
+    """
+    A class wrapper over all forex client api calls
+    """
     api_key = getenv("API_KEY")
     base_url = "https://api.fastforex.io/"
     headers = {"accept": "application/json"}
@@ -99,7 +105,7 @@ class ForexClient:
         parameters: Optional[dict] = None
     ) -> dict:
         """
-        Make a http request to fetch data from forex API
+        Make a http request to fetch data from forex api
         """
         if parameters:
             self.params.update(parameters)
@@ -127,7 +133,7 @@ class ForexClient:
 
     async def get_currencies(self) -> dict:
         """
-        Fetch a list of supported currencies
+        Fetch a list of all supported currencies
         """
         self.data_ttl = 60 * 60 * 24
         self.redis_key = "currencies"

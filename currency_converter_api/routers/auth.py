@@ -6,7 +6,7 @@ from currency_converter_api.errors import Unauthorized
 
 async def verify_user(request: Request):
     """
-    Verifies is user is authorized to request data.
+    Verifies if user is authorized to request data.
     Valid email and api key is required.
     """
     headers = dict(request.headers)

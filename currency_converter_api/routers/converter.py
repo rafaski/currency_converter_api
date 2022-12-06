@@ -1,14 +1,12 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, Depends
 from datetime import datetime
 
+from currency_converter_api.routers.auth import verify_user
 from currency_converter_api.schemas import Output
 from currency_converter_api.forex_client import ForexClient
-from currency_converter_api.routers.auth import verify_user
 from currency_converter_api.errors import BadRequest
 
-router = APIRouter(
-    dependencies=[Depends(verify_user)]
-)
+router = APIRouter(dependencies=[Depends(verify_user)])
 
 
 @router.get(
@@ -17,7 +15,7 @@ router = APIRouter(
 )
 async def currencies(request: Request):
     """
-    Fetch a list of supported currencies
+    Fetch a list of all supported currencies
     """
     available_currencies = await ForexClient().get_currencies()
     return Output(success=True, results=available_currencies)
@@ -100,6 +98,7 @@ async def historical(
     to_curr : Target currency symbol
     date: UTC date in YYYY-MM-DD format
     """
+    # checking if provided date is within the last 14 days limit
     historical_date = datetime.strptime(date, "%Y-%m-%d")
     today_date = datetime.today()
     dt = today_date - historical_date
@@ -107,6 +106,7 @@ async def historical(
         raise BadRequest(
             details="date must be limited to within tle last 14 days"
         )
+
     historical_rates = await ForexClient().get_historical_rates(
         from_curr=from_curr,
         to_curr=to_curr,
