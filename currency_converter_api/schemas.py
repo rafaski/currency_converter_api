@@ -20,11 +20,6 @@ class CreateUser(BaseModel):
     User sign up info
     """
     email: str
-    api_key: str
-    concurrency: Optional[bool] = False
-    credits: Optional[int] = 0
-    subscription: Optional[str] = "basic"
-    expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
     @validator("email")
     def validate_email(cls, value: str):
@@ -35,5 +30,15 @@ class CreateUser(BaseModel):
         raise HTTPException(status_code=400, detail="Check your email address")
 
 
-class ReadUser(BaseModel):
-    pass
+class ReadUser(CreateUser):
+    """"
+    User reading info
+    """
+    api_key: str
+    concurrency: Optional[bool] = False
+    credits: Optional[int] = 0
+    subscription: Optional[str] = "basic"
+    expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
+
+    class Config:
+        orm_mode = True

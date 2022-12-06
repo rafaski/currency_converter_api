@@ -74,7 +74,7 @@ async def all_users(request: Request):
     redis_key = "users"
     user_list_redis = await get(key=redis_key)
     # sql
-    query_sql = users.select()
+    query_sql = users.select(["users"])
     user_list_sql = await database.fetch_all(query_sql)
 
     return Output(success=True, results=query_sql)

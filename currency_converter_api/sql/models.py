@@ -1,14 +1,14 @@
-import sqlalchemy
+from sqlalchemy import Boolean, Column, Integer, String
 
-from .database import metadata
+from .database import Base
 
-users = sqlalchemy.Table(
-    "users",
-    metadata,
-    sqlalchemy.Column("email", sqlalchemy.String),
-    sqlalchemy.Column("api_key", sqlalchemy.String),
-    sqlalchemy.Column("concurrency", sqlalchemy.Boolean),
-    sqlalchemy.Column("credits", sqlalchemy.Integer),
-    sqlalchemy.Column("subscription", sqlalchemy.String),
-    sqlalchemy.Column("expiration", sqlalchemy.String)
-)
+
+class User(Base):
+    __tablename__ = "users"
+
+    email = Column(String, unique=True, index=True)
+    api_key = Column(String, unique=True)
+    concurrency = Column(Boolean, default=False)
+    credits = Column(Integer)
+    subscription = Column(String)
+    expiration = Column(String)
