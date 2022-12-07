@@ -6,7 +6,7 @@ from .database import Base
 class User(Base):
     __tablename__ = "users"
 
-    email = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True, primary_key=True)
     api_key = Column(String, unique=True)
     concurrency = Column(Boolean, default=False)
     credits = Column(Integer)

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, validator
 from typing import Optional, Any
 from fastapi import HTTPException
+from uuid import uuid4
 import re
 
 from datetime import datetime, timedelta
@@ -15,11 +16,8 @@ class Output(BaseModel):
     results: Optional[Any] = None
 
 
-class CreateUser(BaseModel):
-    """
-    User sign up info
-    """
-    email: str
+class UserEmail(BaseModel):
+    email: str = None
 
     @validator("email")
     def validate_email(cls, value: str):
@@ -30,15 +28,15 @@ class CreateUser(BaseModel):
         raise HTTPException(status_code=400, detail="Check your email address")
 
 
-class ReadUser(CreateUser):
-    """"
-    User reading info
+class CreateUser(BaseModel):
     """
-    api_key: str
+    User sign up info
+    """
+    email: str
+    api_key: str = str(uuid4())[:13]
     concurrency: Optional[bool] = False
     credits: Optional[int] = 0
     subscription: Optional[str] = "basic"
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
-    class Config:
-        orm_mode = True
+
