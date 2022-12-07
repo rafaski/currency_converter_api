@@ -4,20 +4,9 @@ from uuid import uuid4
 from currency_converter_api.schemas import Output, CreateUser
 from currency_converter_api.redis_operations import get, lpush, store
 from currency_converter_api.errors import BadRequest
-from currency_converter_api.sql.database import database
-from currency_converter_api.sql.models import users
+from currency_converter_api.sql.sql_operations import get_users, create_user
 
 router = APIRouter()
-
-
-@router.on_event("startup")
-async def startup():
-    await database.connect()
-
-
-@router.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
 
 
 @router.post("/create_user", response_model=Output)
@@ -53,16 +42,7 @@ async def create_user(request: Request, user: CreateUser):
     await store(key=user.email, value=api_key)
     await lpush(key="users", value=user.email)
     # sql
-    query_sql = users.insert().values(
-        email=user.email,
-        api_key=api_key,
-        concurrency=user.concurrency,
-        credits=user.credits,
-        subscription=user.subscription,
-        expiration=user.expiration
-    )
-    last_record_id = await database.execute(query_sql)
-
+    await create_user()
     return Output(success=True, message="User created", results=api_key)
 
 
@@ -74,7 +54,5 @@ async def all_users(request: Request):
     redis_key = "users"
     user_list_redis = await get(key=redis_key)
     # sql
-    query_sql = users.select(["users"])
-    user_list_sql = await database.fetch_all(query_sql)
-
-    return Output(success=True, results=query_sql)
+    users = await get_users()
+    return Output(success=True, results=users)
