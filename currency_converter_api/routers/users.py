@@ -1,21 +1,22 @@
 from fastapi import APIRouter, Request
-from uuid import uuid4
 
-from currency_converter_api.schemas import Output, UserEmail, CreateUser
-from currency_converter_api.redis_operations import get, lpush, store
-from currency_converter_api.errors import BadRequest
+from currency_converter_api.schemas import Output, UserSubscribe, CreateUser
 from currency_converter_api.sql.sql_operations import get_users, create_user
 
 router = APIRouter()
 
 
-@router.post("/create_user", response_model=Output)
-async def create_new_user(request: Request, user: UserEmail):
+@router.post("/subscribe", response_model=Output)
+async def subscribe(request: Request, user: UserSubscribe):
     """
-    Create a user and store user data in redis cache
+    Subscribe a new user with email address and subscription type.
+    Subscriptions: basic, hobby, pro, enterprise
     """
-    new_user = CreateUser(email=user.email)
-    await create_user(user=new_user)
+    new_user = CreateUser(
+        email=user.email,
+        subscription=user.subscription
+    )
+    create_user(user=new_user)
     return Output(
         success=True,
         message="User created",
@@ -28,8 +29,4 @@ async def all_users(request: Request):
     """
     Get a list of all signed-up users
     """
-    redis_key = "users"
-    user_list_redis = await get(key=redis_key)
-    # sql
-    # users = await get_users()
-    # return Output(success=True, results=users)
+    return Output(success=True, results=get_users())
