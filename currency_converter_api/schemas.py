@@ -1,10 +1,11 @@
+import re
 from pydantic import BaseModel, validator
 from typing import Optional, Any
 from fastapi import HTTPException
 from uuid import uuid4
-import re
-
 from datetime import datetime, timedelta
+
+from currency_converter_api.enums import SubscriptionType
 
 
 class Output(BaseModel):
@@ -16,8 +17,9 @@ class Output(BaseModel):
     results: Optional[Any] = None
 
 
-class UserEmail(BaseModel):
+class UserSubscribe(BaseModel):
     email: str = None
+    subscription: SubscriptionType = None
 
     @validator("email")
     def validate_email(cls, value: str):
@@ -32,11 +34,24 @@ class CreateUser(BaseModel):
     """
     User sign up info
     """
+    @staticmethod
+    def credit_points(sub_type: SubscriptionType):
+        """
+        subscription points
+        """
+        subscriptions = {
+            SubscriptionType.BASIC: 20,
+            SubscriptionType.HOBBY: 100,
+            SubscriptionType.PRO: 200,
+            SubscriptionType.ENTERPRISE: 1000
+        }
+        return subscriptions.get(sub_type)
+
     email: str
+    subscription: SubscriptionType
     api_key: str = str(uuid4())[:13]
     concurrency: Optional[bool] = False
-    credits: Optional[int] = 0
-    subscription: Optional[str] = "basic"
+    credits: credit_points(sub_type=UserSubscribe.subscription)
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
 

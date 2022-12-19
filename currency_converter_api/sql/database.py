@@ -8,16 +8,29 @@ DATABASE_URL = "sqlite:///./sql_app.db"
 
 Base = declarative_base()
 
+database = None
+
+
+def init_db() -> None:
+    global database
+    if database is not None:
+        return
+    database = Database(database_url=DATABASE_URL)
+    database.create_session()
+
 
 def database_operation(func):
     @wraps(func)
-    async def _database_operation(*args, **kwargs):
+    def _database_operation(*args, **kwargs):
+        if database is None:
+            init_db()
         open_connection = database.session()
         try:
-            return await func(open_connection, *args, **kwargs)
+            return func(open_connection, *args, **kwargs)
         except Exception as e:
             print(e)
             open_connection.rollback()
+            raise
         finally:
             open_connection.close()
     return _database_operation
@@ -39,12 +52,11 @@ class Database:
             autoflush=False,
             bind=self.engine
         )
+        # Create all tables that do not already exist
+        Base.metadata.create_all(self.engine)
 
     def dispose_session(self):
         self.session.close_all()
         self.engine.dispose()
         self.session = None
-
-
-database = Database(database_url=DATABASE_URL)
 
