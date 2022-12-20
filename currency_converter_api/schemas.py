@@ -18,6 +18,9 @@ class Output(BaseModel):
 
 
 class UserSubscribe(BaseModel):
+    """
+    Subscribing new user with email address and subscription type.
+    """
     email: str = None
     subscription: SubscriptionType = None
 
@@ -32,8 +35,13 @@ class UserSubscribe(BaseModel):
 
 class CreateUser(BaseModel):
     """
-    User sign up info
+    User sign up info from the server:
+    - individual api key
+    - concurrency value
+    - amount of credits to make api calls based on chosen plan
+    - expiration
     """
+
     @staticmethod
     def credit_points(sub_type: SubscriptionType):
         """
@@ -51,7 +59,7 @@ class CreateUser(BaseModel):
     subscription: SubscriptionType
     api_key: str = str(uuid4())[:13]
     concurrency: Optional[bool] = False
-    credits: credit_points(sub_type=UserSubscribe.subscription)
+    credits: int = 20
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
 

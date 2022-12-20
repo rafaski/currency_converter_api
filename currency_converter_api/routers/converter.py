@@ -6,8 +6,8 @@ from currency_converter_api.schemas import Output
 from currency_converter_api.forex_client import ForexClient
 from currency_converter_api.errors import BadRequest
 
-# router = APIRouter(dependencies=[Depends(verify_user)])
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_user)])
+# router = APIRouter()
 
 
 @router.get(

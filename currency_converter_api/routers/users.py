@@ -10,7 +10,8 @@ router = APIRouter()
 async def subscribe(request: Request, user: UserSubscribe):
     """
     Subscribe a new user with email address and subscription type.
-    Subscriptions: basic, hobby, pro, enterprise
+    Subscriptions: basic, hobby, pro, enterprise.
+    Returns individual api key to make api calls.
     """
     new_user = CreateUser(
         email=user.email,
@@ -27,6 +28,6 @@ async def subscribe(request: Request, user: UserSubscribe):
 @router.get("/all_users", response_model=Output)
 async def all_users(request: Request):
     """
-    Get a list of all signed-up users
+    Returns a list of all signed-up users
     """
     return Output(success=True, results=get_users())

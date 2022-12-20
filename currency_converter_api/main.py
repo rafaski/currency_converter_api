@@ -2,16 +2,19 @@ from fastapi import FastAPI
 
 from routers.converter import router as converter_router
 from routers.users import router as user_router
-from sql.database import database, init_db
+from sql.database import database
 
 
 description = """
 Currency Converter allows you to:
 
+* subscribe
+* get all users info
 * get all supported currencies
 * convert currencies
 * fetch a single currency exchange rate
 * fetch all currency exchange rate
+* get historical data on currency exchange rates
 
 Data fetched from fastforex.io api.
 """
