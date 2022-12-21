@@ -7,7 +7,7 @@ from currency_converter_api.forex_client import ForexClient
 from currency_converter_api.errors import BadRequest
 
 router = APIRouter(dependencies=[Depends(verify_user)])
-# router = APIRouter()
+# router = APIRouter()  # comment out above line to avoid user verification
 
 
 @router.get(

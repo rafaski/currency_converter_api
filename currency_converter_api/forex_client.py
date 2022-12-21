@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from os import getenv
 from functools import wraps
 from typing import Optional
-from enum import Enum
 
+from currency_converter_api.enums import ForexEndpoint
 from currency_converter_api.redis_operations import get, store_exp
 from currency_converter_api.errors import (
     BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded
@@ -196,14 +196,3 @@ class ForexClient:
             "to": to_curr
         }
         return await self.request(endpoint=endpoint, parameters=params)
-
-
-class ForexEndpoint(Enum):
-    """
-    Enums for forex endpoints
-    """
-    CURRENCIES = "currencies"
-    FETCH_ONE = "fetch-one"
-    FETCH_ALL = "fetch-all"
-    HISTORICAL = "historical"
-
