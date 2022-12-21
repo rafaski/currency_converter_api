@@ -57,7 +57,6 @@ It showcases the following skills and features:
 4. Install and start the Redis server if necessary.
 5. Run the app from `main.py` file to start the uvicorn server. Change host and port if necessary.
 6. Go to `/docs` endpoint to test the app and make HTTP requests.
-7. You should be good to go 🙂
 
 ## Database
 Both SQL and No-SQL databases were used for this project. 
