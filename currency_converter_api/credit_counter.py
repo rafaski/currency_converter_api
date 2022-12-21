@@ -15,9 +15,9 @@ class APICredit(BaseHTTPMiddleware):
         api_key = headers.get("api_key")
         user = get_user_by_api_key(api_key)
         credit_count = user.get("credits")
-        credits_left = credit_count - 1
-        update_credits(email=api_key, credits_left=credits_left)
-        response.headers['X-Credits-Left'] = credits_left
         if response.get("success"):
+            credits_left = credit_count - 1
+            update_credits(email=api_key, credits_left=credits_left)
+            response.headers['X-Credits-Left'] = credits_left
             return response
         raise Unauthorized()
