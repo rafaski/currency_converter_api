@@ -20,8 +20,8 @@ It showcases the following skills and features:
 - async API calls with fastapi
 - async forex requests with httpx
 - async redis forex recall response storage
-- SQLite user info storage
-- user authentification with request headers
+- SQLite's user info storage
+- user authentication with request headers
 - input validation
 - custom error handling
 - custom decorators
@@ -40,7 +40,22 @@ It showcases the following skills and features:
 tbc
  
 ## Setup
-tbc
+1. Go to `currency_converter_api/main.py` and uncomment the `import uvicorn` at line 1 and the uvicorn server startup lines (they're at the end of the file).
+2. Update the `.env` file as needed. You might want to request trial API key from `https://www.fastforex.io/`
+3. Create a virtual environment in `currency_converter_api` folder and install dependencies.
+Install virtual environment:
+`python3 -m venv venv`
+Activate venv:
+On Windows, run:
+`venv\Scripts\activate.bat`
+On Unix or macOS, run:
+`source venv/bin/activate`
+Install dependencies:
+`pip install -r requirements.txt`
+4. Install and start the Redis server if necessary.
+5. Run the app from `main.py` file to start the uvicorn server. Change host and port if necessary.
+6. Go to `/docs` endpoint to test the app and make HTTP requests.
+7. You should be good to go 🙂
 
 ## Database
 Both SQL and No-SQL databases were used for this project. 

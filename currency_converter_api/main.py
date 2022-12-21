@@ -1,3 +1,4 @@
+# import uvicorn
 from fastapi import FastAPI
 
 from currency_converter_api.routers.converter import router as converter_router
@@ -35,3 +36,12 @@ app.include_router(converter_router)
 @app.on_event("shutdown")
 async def shutdown():
     database.dispose_session()
+
+
+# if __name__ == "__main__":
+#     uvicorn.run(
+#         "main:app",
+#         host="127.0.0.1",
+#         port=8080,
+#         reload=True
+#     )
