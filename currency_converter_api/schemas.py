@@ -32,16 +32,6 @@ class UserSubscribe(BaseModel):
             return value
         raise HTTPException(status_code=400, detail="Check your email address")
 
-
-class CreateUser(BaseModel):
-    """
-    User sign up info from the server:
-    - individual api key
-    - concurrency value
-    - amount of credits to make api calls based on chosen plan
-    - expiration
-    """
-
     @staticmethod
     def credit_points(sub_type: SubscriptionType):
         """
@@ -55,11 +45,21 @@ class CreateUser(BaseModel):
         }
         return subscriptions.get(sub_type)
 
+
+class CreateUser(BaseModel):
+    """
+    User sign up info from the server:
+    - individual api key
+    - concurrency value
+    - amount of credits to make api calls based on chosen plan
+    - expiration
+    """
+
     email: str
     subscription: SubscriptionType
     api_key: str = str(uuid4())[:13]
     concurrency: Optional[bool] = False
-    credits: int = 20
+    credits: int = UserSubscribe.credit_points(UserSubscribe.subscription)
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
 
