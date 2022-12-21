@@ -11,6 +11,10 @@ async def verify_user(request: Request):
     """
     headers = dict(request.headers)
     api_key = headers.get("api_key")
-    if get_user_by_api_key(api_key):
+    user = get_user_by_api_key(api_key)
+    credits_left = user.get("credits")
+    if credits_left <= 0:
+        raise Unauthorized()
+    if user is not None:
         return api_key
     raise Unauthorized()
