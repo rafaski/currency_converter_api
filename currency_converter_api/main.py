@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from routers.converter import router as converter_router
-from routers.users import router as user_router
-from sql.database import database
+from currency_converter_api.routers.converter import router as converter_router
+from currency_converter_api.routers.users import router as user_router
+from currency_converter_api.sql.database import database
 
 
 description = """

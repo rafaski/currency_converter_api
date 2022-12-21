@@ -2,7 +2,7 @@
  
 ## Overview
 A currency Converter API allows you to convert any supported currency and perform the following operations: 
-- subscribe
+- subscribe users
 - get all users info
 - get all supported currencies
 - convert currencies
