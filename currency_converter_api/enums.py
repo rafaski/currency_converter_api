@@ -29,3 +29,13 @@ class SubscriptionType(str, Enum):
     PRO = "pro"
     ENTERPRISE = "enterprise"
 
+
+class ForexEndpoint(str, Enum):
+    """
+    Enums for forex endpoints
+    """
+    CURRENCIES = "currencies"
+    FETCH_ONE = "fetch-one"
+    FETCH_ALL = "fetch-all"
+    HISTORICAL = "historical"
+

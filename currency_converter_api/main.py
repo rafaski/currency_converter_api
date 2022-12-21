@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from currency_converter_api.routers.converter import router as converter_router
 from currency_converter_api.routers.users import router as user_router
 from currency_converter_api.sql.database import database
-
+from currency_converter_api.credit_counter import CreditCounter
 
 description = """
 Currency Converter allows you to:
@@ -28,6 +28,8 @@ app = FastAPI(
         "url": "https://www.fastforex.io/",
     },
 )
+
+# converter_router.add_middleware(CreditCounter)
 
 app.include_router(user_router)
 app.include_router(converter_router)
