@@ -6,8 +6,13 @@ from currency_converter_api.sql.database import database_operation
 
 
 @database_operation
-def get_user(db: Session, email: int):
+def get_user_by_email(db: Session, email: int):
     return db.query(models.User).filter(models.User.email == email).first()
+
+
+@database_operation
+def get_user_by_api_key(db: Session, api_key: int):
+    return db.query(models.User).filter(models.User.api_key == api_key).first()
 
 
 @database_operation
@@ -28,4 +33,10 @@ def create_user(db: Session, user: CreateUser):
     db.add(db_user)
     db.commit()
     return db_user
+
+
+@database_operation
+def update_credits(db: Session, api_key: int, credits_left: int):
+    return db.query(models.User).update().where(
+        models.User.api_key == api_key).values(credits=credits_left)
 

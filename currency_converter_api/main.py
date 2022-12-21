@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from currency_converter_api.routers.converter import router as converter_router
 from currency_converter_api.routers.users import router as user_router
 from currency_converter_api.sql.database import database
-from currency_converter_api.credit_counter import CreditCounter
+from currency_converter_api.credit_counter import APICredit
 
 description = """
 Currency Converter allows you to:
@@ -29,7 +29,7 @@ app = FastAPI(
     },
 )
 
-# converter_router.add_middleware(CreditCounter)
+converter_router.add_middleware(APICredit)
 
 app.include_router(user_router)
 app.include_router(converter_router)

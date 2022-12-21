@@ -1,12 +1,23 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request
 
+from currency_converter_api.sql.sql_operations import (
+    get_user_by_api_key, update_credits
+)
+from currency_converter_api.errors import Unauthorized
 
-class CreditCounter(BaseHTTPMiddleware):
-    async def count(self, request: Request, call_next):
-        # get user credit from sql
+
+class APICredit(BaseHTTPMiddleware):
+
+    async def deduct(self, request: Request, call_next):
         response = await call_next(request)
-        # deduct credits credits -= 1
-        response.headers['X-Credits-Left'] = 0  # pass credit amount in headers
-        # update db with new credit amount
+        headers = dict(request.headers)
+        api_key = headers.get("api_key")
+        user = get_user_by_api_key(api_key)
+        credit_count = user.get("credits")
+        credits_left = credit_count - 1
+        if credits_left <= 0:
+            raise Unauthorized()
+        update_credits(email=api_key, credits_left=credits_left)
+        response.headers['X-Credits-Left'] = credits_left
         return response
