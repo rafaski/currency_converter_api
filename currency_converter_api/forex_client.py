@@ -5,8 +5,8 @@ from functools import wraps
 from typing import Optional
 from enum import Enum
 
-from redis_operations import get, store_exp
-from errors import (
+from currency_converter_api.redis_operations import get, store_exp
+from currency_converter_api.errors import (
     BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded
 )
 
