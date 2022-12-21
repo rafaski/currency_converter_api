@@ -37,7 +37,10 @@ It showcases the following skills and features:
 - python-dotenv
  
 ## Setup with Docker
-tbc
+1. Make sure you have `docker` installed.
+2. Update the `.env` file as needed. You might want to request trial API key from `https://www.fastforex.io/`
+3. Build docker image: `docker build -t currency_converter_api .`
+4. Run docker image and map ports if necessary: `docker run -p 80:80 currency_converter_api`
  
 ## Setup
 1. Go to `currency_converter_api/main.py` and uncomment the `import uvicorn` at line 1 and the uvicorn server startup lines (they're at the end of the file).
