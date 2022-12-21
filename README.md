@@ -25,6 +25,7 @@ It showcases the following skills and features:
 - input validation
 - custom error handling
 - custom decorators
+- custom middleware function to deduct API credits with each API call
 - routers
 - unified response model
  
