@@ -82,7 +82,7 @@ Each converter endpoint has a dependency on verifying signed-up users. Otherwise
 You can see the automatic interactive API documentation (provided by Swagger UI). Use `/docs` endpoint to access.
 
 ## Testing
-Testing the behavior of HTTP requests was performed with the built-in Swagger UI /docs endpoint and Insomnia.
+Testing the behavior of HTTP requests was performed with the built-in Swagger UI `/docs` endpoint and Insomnia.
 
 ![png](https://github.com/rafaski1/currency_converter_api/blob/main/swagger_ui.PNG?raw=true)
 
