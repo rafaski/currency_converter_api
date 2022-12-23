@@ -10,13 +10,14 @@ A currency Converter API allows you to convert any supported currency and perfor
 - fetch all currency exchange rate
 - get historical data on currency exchange rates
 
-It uses foreign forex API from fastforex.io to fetch currency data. 
-Each user can subscribe to our services by providing a valid email and by choosing a subscription plan which will reflect eventually the number of credits they get to make requests and allowed concurrency levels. Each user will be verified and authenticated prior to making API calls and provided with a unique API key.
-To minimize the number of foreign API calls, we will store request JSON responses in redis. Forex API calls will be made only if there is no such key in redis cache. 
+It uses foreign forex API from `fastforex.io` to fetch currency data. 
+Each user can subscribe to our services by providing a valid email and by choosing a subscription plan which will reflect the number of credits they get to make request. 
+Each user will be verified and authenticated prior to making API calls and provided with a unique API key.
+To minimize the number of forex API calls, we will store request JSON responses in redis. Forex API calls will be made only if there is no such key in redis cache. 
 Most redis keys have expiration dates due to fluctuating nature of the currency conversion data.
 
 The main reason for creating this application was to show off skills in creating production-ready real-world applications. 
-It showcases the following skills and features:
+It showcases the following features:
 - async API calls with fastapi
 - async forex requests with httpx
 - async redis forex recall response storage
@@ -39,30 +40,21 @@ It showcases the following skills and features:
  
 ## Setup with Docker
 1. Make sure you have `docker` installed.
-2. Update the `.env` file as needed. You might want to request trial API key from `https://www.fastforex.io/`
-3. Build docker image: `docker build -t currency_converter_api .`
-4. Run docker image and map ports if necessary: `docker run -p 80:80 currency_converter_api`
+2. To run the API you will need an API key from `https://www.fastforex.io/`
+3. Create your `.env` file from `.env.dist` template and add your forex API key.
+4. Build docker image: `docker build -t currency_converter_api .`
+5. Run docker image and map ports if necessary: `docker run -p 80:80 currency_converter_api`
  
 ## Setup
-1. Go to `currency_converter_api/main.py` and uncomment the `import uvicorn` at line 1 and the uvicorn server startup lines (they're at the end of the file).
-2. Update the `.env` file as needed. You might want to request trial API key from `https://www.fastforex.io/`
-3. Create a virtual environment in `currency_converter_api` folder and install dependencies.
-- Install virtual environment:
-`python3 -m venv venv`
-- Activate venv, on Windows, run:
-`venv\Scripts\activate.bat`
-- On Unix or macOS, run:
-`source venv/bin/activate`
-- Install dependencies:
-`pip install -r requirements.txt`
+1. To run the API you will need an API key from `https://www.fastforex.io/`
+2. Create your `.env` file from `.env.dist` template and add your forex API key.
+3. Install virtual environment and dependencies from `requirements.txt`.
 4. Install and start the Redis server if necessary.
-5. Run the app from `main.py` file to start the uvicorn server. Change host and port if necessary.
+5. Run the app from terminal with `uvicorn currency_converter_api:app --reload`.
 6. Go to `/docs` endpoint to test the app and make HTTP requests.
 
 ## Database
-Both SQL and No-SQL databases were used for this project. 
-To limit the number of API calls on external forex API, we store most of the user request recall results in the in-cache redis database with expiration set to 1h if required.
-All user info is stored within the sqlite database, which consists of user email, chosen subscription plan, individual API key, amount of credits to make API calls etc.
+All user info is stored within the sqlite database, which consists of user email, chosen subscription plan, individual API key and amount of credits to make API calls etc.
  
 ## Endpoints
 user related:
