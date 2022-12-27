@@ -4,6 +4,9 @@ from currency_converter_api.enums import ErrorTypes
 
 
 class AppException(Exception):
+    """
+    Base app exception class
+    """
     http_status_code: status = status.HTTP_500_INTERNAL_SERVER_ERROR
     error_type: ErrorTypes = ErrorTypes.UNKNOWN
     details: str = None
