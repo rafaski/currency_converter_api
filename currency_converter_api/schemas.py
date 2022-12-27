@@ -43,7 +43,8 @@ class UserSubscribe(BaseModel):
             SubscriptionType.PRO: 10000,
             SubscriptionType.ENTERPRISE: 50000
         }
-        return subscriptions.get(sub_type)
+        if sub_type is not None:
+            return subscriptions.get(sub_type)
 
 
 class CreateUser(BaseModel):
@@ -59,7 +60,7 @@ class CreateUser(BaseModel):
     subscription: SubscriptionType
     api_key: str = str(uuid4())[:13]
     concurrency: Optional[bool] = False
-    credits: int = UserSubscribe.credit_points(UserSubscribe.subscription)
+    # credits: int = UserSubscribe.credit_points(UserSubscribe.subscription)
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
 
