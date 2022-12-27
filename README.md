@@ -102,4 +102,13 @@ at `/docs` endpoint.
 
 ## Examples
 
-_TODO: provide CURL examples - add CURL command + response in JSON format_
+GET `/convert?amount=1&from_curr=USD&to_curr=EUR`
+```{
+  "base": "USD",
+  "amount": 1,
+  "result": {
+    "EUR": 0.94,
+    "rate": 0.9393
+  },
+  "ms": 1
+}
