@@ -38,10 +38,10 @@ class UserSubscribe(BaseModel):
         subscription points
         """
         subscriptions = {
-            SubscriptionType.BASIC: 20,
-            SubscriptionType.HOBBY: 100,
-            SubscriptionType.PRO: 200,
-            SubscriptionType.ENTERPRISE: 1000
+            SubscriptionType.BASIC: 100,
+            SubscriptionType.HOBBY: 500,
+            SubscriptionType.PRO: 10000,
+            SubscriptionType.ENTERPRISE: 50000
         }
         return subscriptions.get(sub_type)
 

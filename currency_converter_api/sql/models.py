@@ -4,6 +4,9 @@ from currency_converter_api.sql.database import Base
 
 
 class User(Base):
+    """
+    User table for sqlite storage
+    """
     __tablename__ = "users"
 
     email = Column(String, unique=True, index=True, primary_key=True)

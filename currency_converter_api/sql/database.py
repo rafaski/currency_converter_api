@@ -12,6 +12,9 @@ database = None
 
 
 def init_db() -> None:
+    """
+    Initiate database
+    """
     global database
     if database is not None:
         return
@@ -20,6 +23,9 @@ def init_db() -> None:
 
 
 def database_operation(func):
+    """
+    Opens and closes database connection fo each db operation
+    """
     @wraps(func)
     def _database_operation(*args, **kwargs):
         if database is None:
@@ -44,6 +50,10 @@ class Database:
         self.database_url = database_url
 
     def create_session(self):
+        """
+        Creates an engine, provides a factory for Session objects and creates
+        tables that do not already exists
+        """
         self.engine = create_engine(
             DATABASE_URL, connect_args={"check_same_thread": False}
         )
@@ -56,6 +66,9 @@ class Database:
         Base.metadata.create_all(self.engine)
 
     def dispose_session(self):
+        """
+        Closes Session connection and disposes engine
+        """
         self.session.close_all()
         self.engine.dispose()
         self.session = None

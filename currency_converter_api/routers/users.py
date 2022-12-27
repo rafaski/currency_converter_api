@@ -1,9 +1,17 @@
 from fastapi import APIRouter, Request
 
 from currency_converter_api.schemas import Output, UserSubscribe, CreateUser
-from currency_converter_api.sql.sql_operations import get_users, create_user
+from currency_converter_api.sql.operations import get_users, create_user
 
 router = APIRouter()
+
+
+@router.get("/")
+def index(request: Request):
+    return Output(
+        success=True,
+        message="Welcome to Currency converter. Use /docs endpoint to test API"
+    )
 
 
 @router.post("/subscribe", response_model=Output)

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from currency_converter_api.routers.auth import verify_user
 from currency_converter_api.schemas import Output
-from currency_converter_api.forex_client import ForexClient
+from currency_converter_api.dependencies.forex_client import ForexClient
 from currency_converter_api.errors import BadRequest
 
 router = APIRouter(dependencies=[Depends(verify_user)])
