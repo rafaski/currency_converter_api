@@ -9,6 +9,9 @@ router = APIRouter()
 
 @router.get("/ping")
 async def health_check(request: Request):
+    """
+    Checking redis and sqlite connection
+    """
     await ping()
     init_db()
     return Output(success=True, message="pong")
