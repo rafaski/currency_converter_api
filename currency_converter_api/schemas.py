@@ -60,6 +60,7 @@ class CreateUser(BaseModel):
     subscription: SubscriptionType
     api_key: str = str(uuid4())[:13]
     concurrency: Optional[bool] = False
+    credits: int = 100
     # credits: int = UserSubscribe.credit_points(UserSubscribe.subscription)
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
