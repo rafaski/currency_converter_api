@@ -31,7 +31,13 @@ class ApiException(AppException):
 class Unauthorized(ApiException):
     http_status_code: status = status.HTTP_401_UNAUTHORIZED
     error_type: ErrorTypes = ErrorTypes.UNAUTHORIZED
-    details: str = "Your email or api key is invalid"
+    details: str = "Your api key is invalid or not enough credits"
+
+
+class Forbidden(ApiException):
+    http_status_code: status = status.HTTP_403_FORBIDDEN
+    error_type: ErrorTypes = ErrorTypes.FORBIDDEN
+    details: str = "Access forbidden"
 
 
 class BadRequest(ApiException):

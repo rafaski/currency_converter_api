@@ -4,4 +4,3 @@ httpx
 redis
 aioredis
 sqlalchemy
-python-dotenv

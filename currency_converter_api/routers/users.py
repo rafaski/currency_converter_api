@@ -1,14 +1,12 @@
-from fastapi import FastAPI, Request
+from fastapi import Request, APIRouter
 
 from currency_converter_api.schemas import Output, UserSubscribe, CreateUser
-from currency_converter_api.sql.operations import (
-    get_users, create_user, get_user_by_api_key
-)
+from currency_converter_api.sql.operations import create_user
 
-app1 = FastAPI(openapi_prefix="/app1")
+router = APIRouter()
 
 
-@app1.post("/subscribe", response_model=Output)
+@router.post("/subscribe", response_model=Output)
 async def subscribe(request: Request, user: UserSubscribe):
     """
     Subscribe a new user with email address and subscription type.
@@ -26,18 +24,3 @@ async def subscribe(request: Request, user: UserSubscribe):
         results=new_user.api_key
     )
 
-
-@app1.get("/users", response_model=Output)
-async def all_users(request: Request):
-    """
-    Returns a list of all signed-up users
-    """
-    return Output(success=True, results=get_users())
-
-
-@app1.get("/users/{api_key}", response_model=Output)
-async def all_users(request: Request, api_key: str):
-    """
-    Returns user info from database
-    """
-    return Output(success=True, results=get_user_by_api_key(email=api_key))

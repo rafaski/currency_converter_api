@@ -10,10 +10,7 @@ router = APIRouter(dependencies=[Depends(verify_user)])
 # router = APIRouter()  # comment out above line to avoid user verification
 
 
-@router.get(
-    "/currencies",
-    response_model=Output
-)
+@router.get("/currencies", response_model=Output)
 async def currencies(request: Request):
     """
     Fetch a list of all supported currencies
@@ -22,10 +19,7 @@ async def currencies(request: Request):
     return Output(success=True, results=available_currencies)
 
 
-@router.get(
-    "/convert",
-    response_model=Output
-)
+@router.get("/convert", response_model=Output)
 async def convert(
     request: Request,
     amount: int,
@@ -46,10 +40,7 @@ async def convert(
     return Output(success=True, results=converted_currency)
 
 
-@router.get(
-    "/fetch_one",
-    response_model=Output
-)
+@router.get("/fetch_one", response_model=Output)
 async def fetch_one(
     request: Request,
     from_curr: str,
@@ -67,10 +58,7 @@ async def fetch_one(
     return Output(success=True, results=currency_rate)
 
 
-@router.get(
-    "/fetch_all",
-    response_model=Output
-)
+@router.get("/fetch_all", response_model=Output)
 async def fetch_all(request: Request, from_curr: str):
     """
     Fetch all available currency rates.
@@ -82,10 +70,7 @@ async def fetch_all(request: Request, from_curr: str):
     return Output(success=True, results=all_currency_rates)
 
 
-@router.get(
-    "/historical",
-    response_model=Output
-)
+@router.get("/historical", response_model=Output)
 async def historical(
     request: Request,
     from_curr: str,

@@ -1,5 +1,4 @@
 import httpx
-from dotenv import load_dotenv
 from os import getenv
 from functools import wraps
 from typing import Optional
@@ -9,8 +8,6 @@ from currency_converter_api.dependencies.redis_operations import get, store_exp
 from currency_converter_api.errors import (
     BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded
 )
-
-load_dotenv()
 
 # exception_mapper = {
 #     400: ForexException,
@@ -89,8 +86,8 @@ class ForexClient:
     A class wrapper over all forex client api calls
     """
     api_key = getenv("API_KEY")
-    base_url = "https://api.fastforex.io/"
-    headers = {"accept": "application/json"}
+    base_url = getenv("FOREX_BASE_URL")
+    headers = getenv("FOREX_HEADERS")
     params = {
         "api_key": api_key
     }

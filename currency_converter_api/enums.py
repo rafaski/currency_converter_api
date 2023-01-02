@@ -10,6 +10,7 @@ class ErrorTypes(str, Enum):
     UNKNOWN = "unknown"
     # API errors
     UNAUTHORIZED = "unauthorized"
+    FORBIDDEN = "forbidden"
     BAD_REQUEST = "bad_request"
     # Forex errors
     FOREX_ERROR = "forex_error"
