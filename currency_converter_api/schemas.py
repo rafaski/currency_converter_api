@@ -32,19 +32,18 @@ class UserSubscribe(BaseModel):
             return value
         raise HTTPException(status_code=400, detail="Check your email address")
 
-    @staticmethod
-    def credit_points(sub_type: SubscriptionType):
+    @property
+    def credits(self):
         """
         subscription points
         """
-        subscriptions = {
+        subscription_mapper = {
             SubscriptionType.BASIC: 100,
             SubscriptionType.HOBBY: 500,
             SubscriptionType.PRO: 10000,
             SubscriptionType.ENTERPRISE: 50000
         }
-        if sub_type is not None:
-            return subscriptions.get(sub_type)
+        return subscription_mapper.get(self.subscription)
 
 
 class CreateUser(BaseModel):
@@ -56,12 +55,11 @@ class CreateUser(BaseModel):
     - expiration
     """
 
-    email: str
-    subscription: SubscriptionType
+    user: UserSubscribe
     api_key: str = str(uuid4())[:13]
     concurrency: Optional[bool] = False
-    credits: int = 100
-    # credits: int = UserSubscribe.credit_points(UserSubscribe.subscription)
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
+
+
 
 

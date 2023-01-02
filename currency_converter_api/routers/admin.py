@@ -1,28 +1,25 @@
-from fastapi import APIRouter, Request
+from fastapi import Request, APIRouter, Depends
 
 from currency_converter_api.schemas import Output
-from currency_converter_api.dependencies.redis_operations import ping
-from currency_converter_api.sql.database import init_db
+from currency_converter_api.sql.operations import (
+    get_users, get_user_by_api_key
+)
+from currency_converter_api.routers.auth import verify_admin
 
-router = APIRouter()
+router = APIRouter(prefix="/admin", dependencies=[Depends(verify_admin)])
 
 
-@router.get("/ping")
-async def health_check(request: Request):
+@router.get("/users", response_model=Output)
+async def all_users(request: Request):
     """
-    Checking redis and sqlite connection
+    Returns a list of all signed-up users
     """
-    await ping()
-    init_db()
-    return Output(success=True, message="pong")
+    return Output(success=True, results=get_users())
 
 
-@router.get("/")
-def root():
+@router.get("/users/{api_key}", response_model=Output)
+async def all_users(request: Request, api_key: str):
     """
-    Index page
+    Returns user info from database
     """
-    return Output(
-        succes=True,
-        messaage="Welcome to Currency Converter API. Go to /docs to test API"
-    )
+    return Output(success=True, results=get_user_by_api_key(email=api_key))

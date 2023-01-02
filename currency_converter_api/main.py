@@ -1,11 +1,10 @@
-# import uvicorn
 from fastapi import FastAPI
 
-from currency_converter_api.routers.users import app1
 from currency_converter_api.routers.converter import router as converter_router
+from currency_converter_api.routers.health_check import router as health_router
+from currency_converter_api.routers.root import router as root_router
 from currency_converter_api.routers.admin import router as admin_router
 from currency_converter_api.sql.database import database
-from currency_converter_api.middlewares import CreditCounter
 
 description = """
 Currency Converter allows you to:
@@ -30,22 +29,12 @@ app = FastAPI(
     },
 )
 
-app1.add_middleware(CreditCounter)
-
 app.include_router(converter_router)
 app.include_router(admin_router)
-app.mount("/app1", app1)
+app.include_router(health_router)
+app.include_router(root_router)
 
 
 @app.on_event("shutdown")
 async def shutdown():
     database.dispose_session()
-
-
-# if __name__ == "__main__":
-#     uvicorn.run(
-#         "main:app",
-#         host="127.0.0.1",
-#         port=8080,
-#         reload=True
-#     )
