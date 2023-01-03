@@ -35,7 +35,7 @@ class UserSubscribe(BaseModel):
     @property
     def credits(self):
         """
-        subscription points
+        subscription points based on subscription type.
         """
         subscription_mapper = {
             SubscriptionType.BASIC: 100,
@@ -44,6 +44,19 @@ class UserSubscribe(BaseModel):
             SubscriptionType.ENTERPRISE: 50000
         }
         return subscription_mapper.get(self.subscription)
+
+    @property
+    def concurrency(self):
+        """
+        concurrency level based on subscription type.
+        """
+        concurrency_mapper = {
+            SubscriptionType.BASIC: 1,
+            SubscriptionType.HOBBY: 3,
+            SubscriptionType.PRO: 10,
+            SubscriptionType.ENTERPRISE: 15
+        }
+        return concurrency_mapper.get(self.subscription)
 
 
 class CreateUser(BaseModel):
@@ -57,7 +70,6 @@ class CreateUser(BaseModel):
 
     user: UserSubscribe
     api_key: str = str(uuid4())[:13]
-    concurrency: Optional[bool] = False
     expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
 
 

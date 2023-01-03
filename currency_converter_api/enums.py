@@ -8,14 +8,19 @@ class ErrorTypes(str, Enum):
 
     # APP errors
     UNKNOWN = "unknown"
+
     # API errors
     UNAUTHORIZED = "unauthorized"
     FORBIDDEN = "forbidden"
     BAD_REQUEST = "bad_request"
+
     # Forex errors
     FOREX_ERROR = "forex_error"
+    FOREX_BAD_REQUEST = "forex_bad_request"
     FOREX_INVALID_API_KEY = "forex_invalid_api_key"
+    FOREX_FORBIDDEN = "forex_forbidden"
     FOREX_RATE_LIMIT = "forex_rate_limit"
+
     # Redis errors
     REDIS_ERROR = "redis_error"
 

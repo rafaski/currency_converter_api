@@ -16,7 +16,7 @@ Main features:
 - authentication via request headers
 - use of `pydantic` for data models and validation
 - custom error handling
-- credit deduction with middleware functions
+- API call credit counter
 - unified API call response model
 
 ### Currency converter
@@ -60,7 +60,7 @@ Dependency management is handled using `requirements.txt` file.
 ### Docker setup
 
 1. Build a docker image: `docker build -t currency_converter_api .`
-2. Start redis server with : `docker-compose up`
+2. Start redis server with : `docker-compose up -d --build --force-recreate currency_converter_api`
 3. Create a running container: `docker run -p 80:80 currency_converter_api`
 
 ### Local setup
