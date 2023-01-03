@@ -52,9 +52,19 @@ class ForexException(AppException):
     details: str = "Unknown forex exception occurred"
 
 
+class ForexBadRequest(ForexException):
+    error_type: ErrorTypes = ErrorTypes.FOREX_INVALID_API_KEY
+    details: str = "Bad request to forex API"
+
+
 class ForexInvalidApiKey(ForexException):
     error_type: ErrorTypes = ErrorTypes.FOREX_INVALID_API_KEY
     details: str = "Forex API key has expired or is invalid"
+
+
+class ForexForbidden(ForexException):
+    error_type: ErrorTypes = ErrorTypes.FOREX_FORBIDDEN
+    details: str = "Forex API access forbidden"
 
 
 class ForexRateLimitExceeded(ForexException):

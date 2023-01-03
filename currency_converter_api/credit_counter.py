@@ -10,9 +10,9 @@ class CreditCounter(BaseHTTPMiddleware):
     @staticmethod
     async def deduct(request: Request, call_next):
         """
-        A middleware function that deducts user credits for each successful
-        API call. It can access request object and create a custom header
-        with the amount of credits left. It updates credit value in database.
+        A function that deducts user credits for each successful
+        API call. It can access request object and stores the amount
+        of credits left in request.state. It updates credit value in database.
         """
         response = await call_next(request)
         headers = dict(request.headers)

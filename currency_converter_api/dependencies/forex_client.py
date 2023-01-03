@@ -6,15 +6,16 @@ from typing import Optional
 from currency_converter_api.enums import ForexEndpoint
 from currency_converter_api.dependencies.redis_operations import get, store_exp
 from currency_converter_api.errors import (
-    BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded
+    BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded,
+    ForexForbidden, ForexBadRequest
 )
 
-# exception_mapper = {
-#     400: ForexException,
-#     401: ForexInvalidApiKey,
-#     403: ForexException,
-#     429: ForexRateLimitExceeded
-# }
+exception_mapper = {
+    400: ForexBadRequest,
+    401: ForexInvalidApiKey,
+    403: ForexForbidden,
+    429: ForexRateLimitExceeded
+}
 
 
 def cache(func):
@@ -113,19 +114,10 @@ class ForexClient:
                 headers=self.headers
             )
             # handling forex exceptions
-            # if forex_response.status_code is not 200:
-            #     raise exception_mapper.get(forex_response.status_code)(
-            #         details=forex_response.text
-            #     )
-            if forex_response.status_code == 400:
-                raise ForexException(details="Bad request to forex api")
-            if forex_response.status_code == 401:
-                raise ForexInvalidApiKey()
-            if forex_response.status_code == 403:
-                raise ForexException(details="Forbidden")
-            if forex_response.status_code == 429:
-                raise ForexRateLimitExceeded()
-
+            if forex_response.status_code is not 200:
+                raise exception_mapper.get(forex_response.status_code)(
+                    details=forex_response.text
+                )
         return forex_response.json()
 
     async def get_currencies(self) -> dict:
