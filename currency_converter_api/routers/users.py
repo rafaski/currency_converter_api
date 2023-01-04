@@ -13,10 +13,7 @@ async def subscribe(request: Request, user: UserSubscribe):
     Subscriptions: basic, hobby, pro, enterprise.
     Returns individual api key to make api calls.
     """
-    new_user = CreateUser(
-        email=user.email,
-        subscription=user.subscription
-    )
+    new_user = CreateUser(user=user)
     create_user(user=new_user)
     return Output(
         success=True,

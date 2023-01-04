@@ -1,8 +1,8 @@
 from fastapi import Request
-from os import getenv
 
 from currency_converter_api.errors import Unauthorized, Forbidden
 from currency_converter_api.sql.operations import get_user_by_api_key
+from currency_converter_api.settings import ADMIN_API_KEY
 
 
 async def verify_user(request: Request):
@@ -29,7 +29,7 @@ async def verify_admin(request: Request):
     """
     headers = dict(request.headers)
     api_key = headers.get("api_key")
-    if api_key == getenv("ADMIN_API_KEY"):
+    if api_key == ADMIN_API_KEY:
         return api_key
     raise Forbidden()
 

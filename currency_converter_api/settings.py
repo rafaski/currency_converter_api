@@ -9,6 +9,8 @@ def load_variable(name: str, default: Any = None) -> str:
     return variable
 
 
+ADMIN_API_KEY = load_variable(name="ADMIN_API_KEY")
+
 # Dependencies - redis
 REDIS_HOST = load_variable(name="REDIS_HOST", default="127.0.0.1")
 REDIS_PORT = load_variable(name="REDIS_PORT", default="6379")
@@ -22,10 +24,7 @@ FOREX_BASE_URL = load_variable(
     name="FOREX_BASE_URL",
     default="https://api.fastforex.io/"
 )
-FOREX_HEADERS = load_variable(
-    name="FOREX_HEADERS",
-    default={"accept": "application/json"}
-)
+FOREX_API_KEY = load_variable(name="FOREX_API_KEY")
 
 # DB
 DATABASE_URL = load_variable(

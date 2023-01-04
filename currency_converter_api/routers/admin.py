@@ -22,4 +22,4 @@ async def all_users(request: Request, api_key: str):
     """
     Returns user info from database
     """
-    return Output(success=True, results=get_user_by_api_key(email=api_key))
+    return Output(success=True, results=get_user_by_api_key(api_key=api_key))
