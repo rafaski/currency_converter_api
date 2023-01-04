@@ -3,9 +3,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from typing import Optional
 from functools import wraps
-from os import getenv
 
-DATABASE_URL = getenv("DATABASE_URL")
+from currency_converter_api.settings import DATABASE_URL
+
 
 Base = declarative_base()
 

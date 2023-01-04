@@ -23,11 +23,11 @@ def get_users(db: Session):
 @database_operation
 def create_user(db: Session, user: CreateUser):
     db_user = models.User(
-        email=user.email,
-        subscription=user.subscription,
+        email=user.user.email,
+        subscription=user.user.subscription,
         api_key=user.api_key,
-        concurrency=user.concurrency,
-        credits=user.credits,
+        concurrency=user.user.concurrency,
+        credits=user.user.credits,
         expiration=user.expiration
     )
     db.add(db_user)

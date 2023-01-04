@@ -5,7 +5,7 @@ from currency_converter_api.routers.auth import verify_user
 from currency_converter_api.schemas import Output
 from currency_converter_api.dependencies.forex_client import ForexClient
 from currency_converter_api.errors import BadRequest
-from currency_converter_api.credit_counter import CreditCounter
+from currency_converter_api.credit_counter import deduct
 
 router = APIRouter(dependencies=[Depends(verify_user)])
 # router = APIRouter()  # comment out above line to avoid user verification
@@ -17,7 +17,7 @@ async def currencies(request: Request):
     Fetch a list of all supported currencies
     """
     available_currencies = await ForexClient().get_currencies()
-    await CreditCounter.deduct(request=request, call_next=currencies)
+    deduct(request=request)
     return Output(success=True, results=available_currencies)
 
 
@@ -39,7 +39,7 @@ async def convert(
         to_curr=to_curr,
         amount=amount
     )
-    await CreditCounter.deduct(request=request, call_next=convert)
+    deduct(request=request)
     return Output(success=True, results=converted_currency)
 
 
@@ -58,7 +58,7 @@ async def fetch_one(
         from_curr=from_curr,
         to_curr=to_curr
     )
-    await CreditCounter.deduct(request=request, call_next=fetch_one)
+    deduct(request=request)
     return Output(success=True, results=currency_rate)
 
 
@@ -71,7 +71,7 @@ async def fetch_all(request: Request, from_curr: str):
     all_currency_rates = await ForexClient().get_all_currency_rates(
         from_curr=from_curr
     )
-    await CreditCounter.deduct(request=request, call_next=fetch_all)
+    deduct(request=request)
     return Output(success=True, results=all_currency_rates)
 
 
@@ -103,7 +103,7 @@ async def historical(
         to_curr=to_curr,
         date=date
     )
-    await CreditCounter.deduct(request=request, call_next=historical)
+    deduct(request=request)
     return Output(success=True, results=historical_rates)
 
 

@@ -4,6 +4,7 @@ from currency_converter_api.routers.converter import router as converter_router
 from currency_converter_api.routers.health_check import router as health_router
 from currency_converter_api.routers.root import router as root_router
 from currency_converter_api.routers.admin import router as admin_router
+from currency_converter_api.routers.users import router as user_router
 from currency_converter_api.sql.database import database
 
 description = """
@@ -33,6 +34,7 @@ app.include_router(converter_router)
 app.include_router(admin_router)
 app.include_router(health_router)
 app.include_router(root_router)
+app.include_router(user_router)
 
 
 @app.on_event("shutdown")

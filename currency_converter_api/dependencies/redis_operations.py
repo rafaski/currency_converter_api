@@ -3,11 +3,11 @@ from typing import Any, NoReturn
 import json
 from typing import Optional
 from functools import wraps
-from os import getenv
 
 from currency_converter_api.errors import RedisException
+from currency_converter_api.settings import REDIS_URL
 
-redis_connection = aioredis.from_url(getenv("REDIS_URL"))
+redis_connection = aioredis.from_url(REDIS_URL)
 
 
 def redis_operation(func):

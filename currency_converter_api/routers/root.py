@@ -11,6 +11,6 @@ def root():
     Index page
     """
     return Output(
-        succes=True,
-        messaage="Welcome to Currency Converter API. Go to /docs to test API"
+        success=True,
+        message="Welcome to Currency Converter API. Go to /docs to test API"
     )

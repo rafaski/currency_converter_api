@@ -1,5 +1,4 @@
 import httpx
-from os import getenv
 from functools import wraps
 from typing import Optional
 
@@ -9,6 +8,7 @@ from currency_converter_api.errors import (
     BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded,
     ForexForbidden, ForexBadRequest
 )
+from currency_converter_api.settings import FOREX_BASE_URL, FOREX_API_KEY
 
 exception_mapper = {
     400: ForexBadRequest,
@@ -86,12 +86,8 @@ class ForexClient:
     """
     A class wrapper over all forex client api calls
     """
-    api_key = getenv("API_KEY")
-    base_url = getenv("FOREX_BASE_URL")
-    headers = getenv("FOREX_HEADERS")
-    params = {
-        "api_key": api_key
-    }
+    headers = {"accept": "application/json"}
+    params = {"api_key": FOREX_API_KEY}
     data_ttl = 60 * 60
     redis_key: Optional[str] = None
 
@@ -109,12 +105,12 @@ class ForexClient:
             self.params.update(parameters)
         async with httpx.AsyncClient() as client:
             forex_response = await client.get(
-                url=f"{self.base_url}{endpoint}",
+                url=f"{FOREX_BASE_URL}{endpoint}",
                 params=self.params,
                 headers=self.headers
             )
             # handling forex exceptions
-            if forex_response.status_code is not 200:
+            if forex_response.status_code != 200:
                 raise exception_mapper.get(forex_response.status_code)(
                     details=forex_response.text
                 )
