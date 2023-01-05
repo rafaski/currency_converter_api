@@ -40,3 +40,4 @@ app.include_router(user_router)
 @app.on_event("shutdown")
 async def shutdown():
     database.dispose_session()
+
