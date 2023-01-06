@@ -7,7 +7,7 @@ from currency_converter_api.dependencies.forex_client import ForexClient
 from currency_converter_api.errors import BadRequest
 from currency_converter_api.credit_counter import deduct
 
-router = APIRouter(dependencies=[Depends(verify_user)])
+router = APIRouter(prefix="/converter", dependencies=[Depends(verify_user)])
 # router = APIRouter()  # comment out above line to avoid user verification
 
 
