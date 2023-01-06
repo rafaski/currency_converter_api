@@ -5,7 +5,7 @@ from currency_converter_api.schemas import Output
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", tags=["root"])
 def root():
     """
     Index page
