@@ -9,7 +9,7 @@ from currency_converter_api.routers.auth import verify_admin
 router = APIRouter(prefix="/admin", dependencies=[Depends(verify_admin)])
 
 
-@router.get("/users", response_model=Output)
+@router.get("/users", response_model=Output, tags=["admin"])
 async def all_users(request: Request):
     """
     Returns a list of all signed-up users
@@ -17,7 +17,7 @@ async def all_users(request: Request):
     return Output(success=True, results=get_users())
 
 
-@router.get("/users/{api_key}", response_model=Output)
+@router.get("/users/{api_key}", response_model=Output, tags=["admin"])
 async def all_users(request: Request, api_key: str):
     """
     Returns user info from database

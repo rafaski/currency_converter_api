@@ -6,7 +6,7 @@ from currency_converter_api.dependencies.redis_operations import ping
 router = APIRouter()
 
 
-@router.get("/ping")
+@router.get("/ping", tags=["health"])
 async def health_check(request: Request):
     """
     Checking redis connection
