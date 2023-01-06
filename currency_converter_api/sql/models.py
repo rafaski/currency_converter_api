@@ -11,7 +11,7 @@ class User(Base):
 
     email = Column(String, unique=True, index=True, primary_key=True)
     api_key = Column(String, unique=True)
-    concurrency = Column(Boolean, default=False)
+    concurrency = Column(Integer, default=False)
     credits = Column(Integer)
     subscription = Column(String)
     expiration = Column(String)
