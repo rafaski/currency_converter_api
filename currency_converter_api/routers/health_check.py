@@ -11,5 +11,8 @@ async def health_check(request: Request):
     """
     Checking redis connection
     """
-    await ping()
-    return Output(success=True, message="pong")
+    try:
+        if ping():
+            return Output(success=True, message="Pong")
+    except redis.ConnectionError:
+        return Output(success=False, message="Raised connection error")
