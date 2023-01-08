@@ -4,10 +4,10 @@ import aioredis
 from currency_converter_api.schemas import Output
 from currency_converter_api.dependencies.redis_operations import ping
 
-router = APIRouter()
+router = APIRouter(tags=["health"])
 
 
-@router.get("/ping", tags=["health"])
+@router.get("/ping")
 async def health_check(request: Request):
     """
     Checking redis connection
