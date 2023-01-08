@@ -3,10 +3,10 @@ from fastapi import Request, APIRouter
 from currency_converter_api.schemas import Output, UserSubscribe, CreateUser
 from currency_converter_api.sql.operations import create_user
 
-router = APIRouter()
+router = APIRouter(tags=["subscribe"])
 
 
-@router.post("/subscribe", response_model=Output, tags=["subscribe"])
+@router.post("/subscribe", response_model=Output)
 async def subscribe(request: Request, user: UserSubscribe):
     """
     Subscribe a new user with email address and subscription type.
