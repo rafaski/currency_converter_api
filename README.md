@@ -11,8 +11,8 @@ and build a real-world application from scratch.
 Main features:
 - FastAPI framework
 - async HTTP requests using `httpx` library
-- caching with async Redis using `aioredis` library
-- database operations using SQLite and `sqlalchemy`
+- caching with async `Redis` using `aioredis` library
+- database operations using `SQLite` and `sqlalchemy`
 - authentication via request headers
 - use of `pydantic` for data models and validation
 - custom error handling
@@ -66,7 +66,7 @@ Dependency management is handled using `requirements.txt` file.
 ### Local setup
 
 1. Install dependencies from `requirements.txt` file
-2. Run the app: `uvicorn currency_converter_api:app --reload`
+2. Run the app: `uvicorn currency_converter_api.main:app --reload`
 
 ## Documentation
 Once the application is up and running, you can access FastAPI automatic docs 
