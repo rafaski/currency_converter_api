@@ -18,12 +18,14 @@ async def all_users(request: Request):
     """
     Returns a list of all signed-up users
     """
-    return Output(success=True, results=get_users())
+    users = get_users()
+    return Output(success=True, results=users)
 
 
 @router.get("/users/{api_key}", response_model=Output)
-async def all_users(request: Request, api_key: str):
+async def get_user_by_api_key(request: Request, api_key: str):
     """
     Returns user info from database
     """
-    return Output(success=True, results=get_user_by_api_key(api_key=api_key))
+    user = get_user_by_api_key(api_key=api_key)
+    return Output(success=True, results=user)
