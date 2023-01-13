@@ -1,10 +1,11 @@
 from fastapi import Request, APIRouter, Depends
 
 from currency_converter_api.schemas import Output
-from currency_converter_api.sql.operations import (
-    get_users, get_user_by_api_key
+
+from currency_converter_api.dependencies.mongo_connection import (
+    get_all_users, get_user_by_api_key
 )
-from currency_converter_api.routers.auth import verify_admin
+from currency_converter_api.auth.verification import verify_admin
 
 router = APIRouter(
     prefix="/admin",
@@ -18,7 +19,7 @@ async def all_users(request: Request):
     """
     Returns a list of all signed-up users
     """
-    users = get_users()
+    users = await get_all_users()
     return Output(success=True, results=users)
 
 

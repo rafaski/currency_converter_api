@@ -70,5 +70,5 @@ async def store_exp(key: str, time: int, value: Any) -> None:
 
 
 @redis_operation
-def ping() -> bool | NoReturn:
-    return redis_connection.ping()
+async def ping() -> bool | NoReturn:
+    return await redis_connection.ping()

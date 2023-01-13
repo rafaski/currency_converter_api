@@ -3,4 +3,4 @@ uvicorn
 httpx
 redis
 aioredis
-sqlalchemy
+motor

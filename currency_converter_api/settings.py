@@ -19,6 +19,14 @@ REDIS_URL = load_variable(
     default=f"redis://{REDIS_HOST}:{REDIS_PORT}"
 )
 
+# Dependencies - mongodb
+MONGODB_HOST = load_variable(name="MONGODB_HOST", default="127.0.0.1")
+MONGODB_PORT = load_variable(name="MONGODB_PORT", default="27017")
+MONGODB_URL = load_variable(
+    name="MONGODB_URL",
+    default=f"mongodb://{MONGODB_HOST}:{MONGODB_PORT}"
+)
+
 # Dependencies - forex
 FOREX_BASE_URL = load_variable(
     name="FOREX_BASE_URL",

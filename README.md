@@ -12,7 +12,7 @@ Main features:
 - FastAPI framework
 - async HTTP requests using `httpx` library
 - caching with async `Redis` using `aioredis` library
-- database operations using `SQLite` and `sqlalchemy`
+- database operations using async `Mongo DB` with `motor`
 - authentication via request headers
 - use of `pydantic` for data models and validation
 - custom error handling
@@ -33,12 +33,12 @@ Each currency conversion operation is charged 1 credit.
 ### Subscriptions
 The API offers several subscription plans:
 
-| Subscription plan  | Credits | Concurrency | 
-| ------------- | ------------- | ------------- |
-| Basic  | 100  | 1 |
-| Hobby  | 500  | 3 |
-| Pro  | 10.000  | 10 |
-| Enterprise  | 50.000  | 15 |
+| Subscription plan | Credits | Concurrency | 
+|-------------------|---------|-------------|
+| Basic             | 100     | 1           |
+| Hobby             | 500     | 3           |
+| Pro               | 10.000  | 10          |
+| Enterprise        | 50.000  | 15          |
 
 Each user can subscribe to the service by providing a valid email address. 
 After successful subscription the user receives an API key that is required
@@ -70,35 +70,35 @@ Dependency management is handled using `requirements.txt` file.
 
 ## Documentation
 Once the application is up and running, you can access FastAPI automatic docs 
-at `/docs` endpoint.
+at index page `/`.
 
 ### Currency converter endpoints
 
-| Method | Endpoint  | Description |
-| ------------- | ------------- | ------------- |
-| GET | /currencies  | fetch a list of all supported currencies |
-| GET | /convert  | convert one currency into another currency |
-| GET | /fetch_one  | fetch a single exchange rate |
-| GET | /fetch_all  | fetch all available exchange rates |
-| GET | /historical  | get historical exchange rates|
+| Method | Endpoint    | Description                                |
+|--------|-------------|--------------------------------------------|
+| GET    | /currencies | fetch a list of all supported currencies   |
+| GET    | /convert    | convert one currency into another currency |
+| GET    | /fetch_one  | fetch a single exchange rate               |
+| GET    | /fetch_all  | fetch all available exchange rates         |
+| GET    | /historical | get historical exchange rates              |
 
 ### Admin endpoints
 
-| Method | Endpoint  | Description |
-| ------------- | ------------- | ------------- |
-| POST | /subscribe  | create a new subscription |
-| GET | /all_users  | list all signed-up users |
+| Method | Endpoint      | Description                |
+|--------|---------------|----------------------------|
+| POST   | /subscribe    | create a new subscription  |
+| GET    | /all_users    | list all signed-up users   |
 
 ## Status codes
 
-| Status code  | Description |
-| ------------- | ------------- |
-| 200  | success |
-| 400  | bad request, please check your request |
-| 401  | user unauthorized, check your API key |
-| 424  | external dependency failed |
-| 429  | rate limit violation |
-| 500  | internal server error, application failed |
+| Status code | Description                               |
+|-------------|-------------------------------------------|
+| 200         | success                                   |
+| 400         | bad request, please check your request    |
+| 401         | user unauthorized, check your API key     |
+| 424         | external dependency failed                |
+| 429         | rate limit violation                      |
+| 500         | internal server error, application failed |
 
 ## Examples
 

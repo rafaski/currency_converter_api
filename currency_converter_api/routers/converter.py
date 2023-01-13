@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Depends
 from datetime import datetime
 
-from currency_converter_api.routers.auth import verify_user
+from currency_converter_api.auth.verification import verify_user
 from currency_converter_api.schemas import Output
 from currency_converter_api.dependencies.forex_client import ForexClient
 from currency_converter_api.errors import BadRequest

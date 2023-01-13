@@ -24,6 +24,9 @@ class ErrorTypes(str, Enum):
     # Redis errors
     REDIS_ERROR = "redis_error"
 
+    # Mongo db errors
+    MONGO_DB_ERROR = "mongo_db_error"
+
 
 class SubscriptionType(str, Enum):
     """
