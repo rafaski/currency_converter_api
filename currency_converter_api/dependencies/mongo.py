@@ -54,3 +54,10 @@ async def get_all_users() -> list:
 @mongo_operation
 async def remove_user(email: str) -> None:
     await collection_users.delete_one({"email": email})
+
+
+@mongo_operation
+async def update_credits(api_key: str, credits_left: int) -> None:
+    await collection_users.find_one({"api_key": api_key}).replace_one(
+        {"credits_left": credits_left}
+    )

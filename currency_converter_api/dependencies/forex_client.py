@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Optional
 
 from currency_converter_api.enums import ForexEndpoint
-from currency_converter_api.dependencies.redis_operations import get, store_exp
+from currency_converter_api.dependencies.redis import get, store_exp
 from currency_converter_api.errors import (
     BadRequest, ForexException, ForexInvalidApiKey, ForexRateLimitExceeded,
     ForexForbidden, ForexBadRequest

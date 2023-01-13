@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 import aioredis
 
 from currency_converter_api.schemas import Output
-from currency_converter_api.dependencies.redis_operations import ping
+from currency_converter_api.dependencies.redis import ping
 
 router = APIRouter(tags=["health"])
 

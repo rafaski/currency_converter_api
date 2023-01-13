@@ -1,7 +1,7 @@
 from fastapi import Request
 
 from currency_converter_api.errors import Unauthorized, Forbidden
-from currency_converter_api.dependencies.mongo_connection import (
+from currency_converter_api.dependencies.mongo import (
     get_user_by_api_key
 )
 from currency_converter_api.settings import ADMIN_API_KEY

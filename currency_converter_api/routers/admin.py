@@ -2,7 +2,7 @@ from fastapi import Request, APIRouter, Depends
 
 from currency_converter_api.schemas import Output
 
-from currency_converter_api.dependencies.mongo_connection import (
+from currency_converter_api.dependencies.mongo import (
     get_all_users, get_user_by_api_key
 )
 from currency_converter_api.auth.verification import verify_admin
