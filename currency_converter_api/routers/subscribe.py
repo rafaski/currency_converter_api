@@ -1,7 +1,7 @@
 from fastapi import Request, APIRouter
 
 from currency_converter_api.schemas import Output, UserSubscribe, CreateUser
-from currency_converter_api.sql.operations import create_user
+from currency_converter_api.dependencies.mongo_connection import create_user
 
 router = APIRouter(tags=["subscribe"])
 
@@ -14,7 +14,7 @@ async def subscribe(request: Request, user: UserSubscribe):
     Returns individual api key to make api calls.
     """
     new_user = CreateUser(user=user)
-    create_user(user=new_user)
+    await create_user(user=new_user)
     return Output(
         success=True,
         message="User created",

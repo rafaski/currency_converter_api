@@ -2,10 +2,8 @@ from fastapi import FastAPI
 
 from currency_converter_api.routers.converter import router as converter_router
 from currency_converter_api.routers.health_check import router as health_router
-from currency_converter_api.routers.root import router as root_router
 from currency_converter_api.routers.admin import router as admin_router
 from currency_converter_api.routers.subscribe import router as subscribe_router
-from currency_converter_api.sql.database import database
 
 description = """
 Currency Converter allows you to:
@@ -25,6 +23,7 @@ Currency data fetched from fastforex.io api.
 
 app = FastAPI(
     title="Currency Converter",
+    docs_url="/",
     description=description,
     contact={
         "name": "FastForex",
@@ -32,14 +31,9 @@ app = FastAPI(
     },
 )
 
-app.include_router(root_router)
 app.include_router(health_router)
 app.include_router(subscribe_router)
 app.include_router(converter_router)
 app.include_router(admin_router)
 
-
-@app.on_event("shutdown")
-async def shutdown():
-    database.dispose_session()
 
