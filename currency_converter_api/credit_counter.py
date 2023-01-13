@@ -1,6 +1,6 @@
 from fastapi import Request
 
-from currency_converter_api.sql.operations import update_credits
+from currency_converter_api.dependencies.mongo import update_credits
 
 
 def deduct(request: Request):
@@ -13,4 +13,4 @@ def deduct(request: Request):
     api_key = headers.get("api_key")
 
     credits_left = request.state.credits - 1
-    update_credits(api_key=api_key, credits_left=credits_left)
+    await update_credits(api_key=api_key, credits_left=credits_left)
