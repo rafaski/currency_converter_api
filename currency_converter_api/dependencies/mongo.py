@@ -58,6 +58,7 @@ async def remove_user(email: str) -> None:
 
 @mongo_operation
 async def update_credits(api_key: str, credits_left: int) -> None:
-    await collection_users.find_one({"api_key": api_key}).replace_one(
-        {"credits_left": credits_left}
+    await collection_users.update_one(
+        {"api_key": api_key},
+        {'$set': {"credits_left": credits_left}}
     )
