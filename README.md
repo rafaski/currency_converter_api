@@ -103,7 +103,8 @@ at index page `/`.
 ## Examples
 
 GET `/convert?amount=1&from_curr=USD&to_curr=EUR`
-```{
+```json 
+{
   "base": "USD",
   "amount": 1,
   "result": {
@@ -111,4 +112,4 @@ GET `/convert?amount=1&from_curr=USD&to_curr=EUR`
     "rate": 0.9393
   },
   "ms": 1
-}
+}```
