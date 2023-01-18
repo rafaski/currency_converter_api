@@ -114,3 +114,6 @@ GET `/convert?amount=1&from_curr=USD&to_curr=EUR`
   "ms": 1
 }
 ```
+
+## Swagger UI
+![png](img/swagger_ui.PNG)

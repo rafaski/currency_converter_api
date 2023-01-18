@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY ./currency_converter_api /code/currency_converter_api
 
 #
-CMD ["uvicorn", "currency_converter_api.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "currency_converter_api.main:app", "--host", "127.0.0.1", "--port", "8080"]
