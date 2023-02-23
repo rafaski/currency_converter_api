@@ -60,9 +60,9 @@ def validate_input(func):
                 return True
 
         # before I run the function, I validate kwargs (currency codes)
-        if any([
-            not await is_currency_valid(kwargs.get("from_curr")),
-            not await is_currency_valid(kwargs.get("to_curr"))
+        if not any([
+            await is_currency_valid(kwargs.get("from_curr")),
+            await is_currency_valid(kwargs.get("to_curr"))
         ]):
             raise BadRequest(details="Invalid currency")
         return await func(*args, **kwargs)

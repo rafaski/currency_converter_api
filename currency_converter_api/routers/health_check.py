@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-import aioredis
+from redis import asyncio as aioredis
 
 from currency_converter_api.schemas import Output
 from currency_converter_api.dependencies.redis import ping
@@ -15,5 +15,5 @@ async def health_check(request: Request):
     try:
         if ping():
             return Output(success=True, message="Pong")
-    except aioredis.exceptions.ConnectionError:
+    except aioredis.ConnectionError:
         return Output(success=False, message="Raised connection error")

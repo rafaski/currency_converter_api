@@ -1,6 +1,5 @@
 fastapi
 uvicorn
 httpx
-redis
-aioredis
+redis>=4.2.0rc1
 motor

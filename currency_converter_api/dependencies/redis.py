@@ -1,4 +1,4 @@
-import aioredis
+from redis import asyncio as aioredis
 from typing import Any, NoReturn
 import json
 from typing import Optional
@@ -18,7 +18,7 @@ def redis_operation(func):
     async def _redis_operation(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
-        except aioredis.exceptions.RedisError as error:
+        except aioredis.RedisError as error:
             raise RedisException(details=str(error))
     return _redis_operation
 
