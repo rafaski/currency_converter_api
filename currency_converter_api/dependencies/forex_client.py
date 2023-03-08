@@ -1,6 +1,5 @@
 import httpx
 from functools import wraps
-from typing import Optional
 
 from currency_converter_api.enums import ForexEndpoint
 from currency_converter_api.dependencies.redis import get, store_exp
@@ -52,7 +51,7 @@ def validate_input(func):
     @wraps(func)
     async def _validate_input(*args, **kwargs):
 
-        async def is_currency_valid(currency_code: Optional[str]) -> bool:
+        async def is_currency_valid(currency_code: str | None) -> bool:
             if currency_code is None:
                 return True
             all_currencies = await args[0].get_currencies()
@@ -89,14 +88,14 @@ class ForexClient:
     headers = {"accept": "application/json"}
     params = {"api_key": FOREX_API_KEY}
     data_ttl = 60 * 60
-    redis_key: Optional[str] = None
+    redis_key: str | None = None
 
     @httpx_error_handler
     @cache
     async def request(
         self,
         endpoint: str,
-        parameters: Optional[dict] = None
+        parameters: dict | None = None
     ) -> dict:
         """
         Make a http request to fetch data from forex api
