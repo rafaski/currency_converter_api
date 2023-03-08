@@ -1,6 +1,6 @@
 import re
 from pydantic import BaseModel, validator
-from typing import Optional, Any
+from typing import Any
 from fastapi import HTTPException
 from uuid import uuid4
 from datetime import datetime, timedelta
@@ -13,8 +13,8 @@ class Output(BaseModel):
     User output layout class
     """
     success: bool
-    message: Optional[str] = None
-    results: Optional[Any] = None
+    message: str | None = None
+    results: Any = None
 
 
 class UserSubscribe(BaseModel):
@@ -70,7 +70,7 @@ class CreateUser(BaseModel):
 
     user: UserSubscribe
     api_key: str = str(uuid4())[:13]
-    expiration: Optional[str] = str(datetime.now() + timedelta(hours=1))
+    expiration: str | None = str(datetime.now() + timedelta(hours=1))
 
 
 

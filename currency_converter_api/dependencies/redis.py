@@ -1,7 +1,6 @@
 from redis import asyncio as aioredis
 from typing import Any, NoReturn
 import json
-from typing import Optional
 from functools import wraps
 
 from currency_converter_api.errors import RedisException
@@ -24,9 +23,9 @@ def redis_operation(func):
 
 
 def cast(
-    value: Optional[Any],  # this is a value loaded from redis
+    value: Any,  # this is a value loaded from redis
     expected_type: str = "str",
-) -> Optional[Any]:
+) -> Any:
     """
     Checks data type of the value stored in redis and loads or decodes value.
     """
@@ -40,7 +39,7 @@ def cast(
 
 
 @redis_operation
-async def get(key: str, expected_type: Optional[str] = "str") -> Any:
+async def get(key: str, expected_type: str | None = "str") -> Any:
     results = await redis_connection.get(key)
     return cast(value=results, expected_type=expected_type)
 
