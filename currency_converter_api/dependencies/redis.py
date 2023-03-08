@@ -23,9 +23,9 @@ def redis_operation(func):
 
 
 def cast(
-    value: Any,  # this is a value loaded from redis
+    value: Any | None,  # this is a value loaded from redis
     expected_type: str = "str",
-) -> Any:
+) -> Any | None:
     """
     Checks data type of the value stored in redis and loads or decodes value.
     """
